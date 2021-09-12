@@ -10,9 +10,6 @@ def isClip(text):
                 return True
     return False
 
-def secondOfFrame(frame, fps):
-    return frame // fps
-
 def grabMapName(frame) -> str:
     #find ROI
 
@@ -33,7 +30,7 @@ def grabMapName(frame) -> str:
 
     return text
 
-def grabFeed(frame) -> list:
+def grabFeed(frame, second) -> list:
     #find ROI
 
     feed = frame[:, :]
@@ -54,10 +51,11 @@ def grabFeed(frame) -> list:
     print(text)
 
     if isClip(text):
-        second = secondOfFrame(frame, 60)
-        if second >= 5:
-            clip_range = [second-5, second+5]
-        else:
-            clip_range = [0, second+5]
+        clip_range = [second-5, second+5]
+
+        # check if a map has been found
+        # make sure the map is not the same as well
+            # make sure map isnt the same as the last
+        # upload youtube url to db
 
     return clip_range

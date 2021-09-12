@@ -70,4 +70,3 @@ text = text.split('\n')[:-1]
 
 print(isClip(text))
 print(isClip(['a', 'a']))
-print(secondOfFrame(frame=125, fps=30))
