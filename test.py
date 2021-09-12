@@ -31,6 +31,12 @@ def isClip(text):
 def secondOfFrame(frame, fps):
     return frame // fps
 
+def grabMap(image):
+    pass
+
+def grabFeed(image):
+    pass
+
 
 # try resizing the image to get broader pixel values
 # You only need to look on the left side of the kill feed. That determines a clip

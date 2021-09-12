@@ -18,6 +18,7 @@
   - Haar cascade?
     - check if the outline of the map matches?
   - Look for any mention of the map during the detection of a clip
+  - Map is mentioned before the beginning of the match
   - End of game review
     - mentions map and duration of map
     - calculate amount of frames to rewind footage by
