@@ -27,6 +27,9 @@ def isClip(text):
         for j in range(i+1, len(text)):
             if text[i] == text[j]:
                 return True
+            else:
+                if text[i][1] == text[j][1]:
+                    return True
     return False
 
 def secondOfFrame(frame, fps):
@@ -77,6 +80,7 @@ if args["detection"] == "map":
     text = text.split("*")[0]
 if args["detection"] == "feed":
     text = text.split('\n')[:-1]
+    # players format [['clan tag', 'gamertag'], ...]
     players = []
     for line in text:
         if line[0] == '[':
