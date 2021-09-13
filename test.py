@@ -88,3 +88,4 @@ if args["detection"] == "feed":
 
     print(players)
     print(isClip(players))
+    # print(isClip([['[ATL]', 'gamertag'], ['(Atl]', 'gamertag']]))

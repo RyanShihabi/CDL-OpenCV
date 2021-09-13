@@ -12,17 +12,15 @@ def isClip(text):
 
 def grabMapName(frame) -> str:
     #find ROI
-
-    mapName = frame[:, :]
-
-    width = int(image.shape[1] * 300 / 100)
-    height = int(image.shape[0] * 300 / 100)
+    width = int(frame.shape[1] * 300 / 100)
+    height = int(frame.shape[0] * 300 / 100)
 
     dimensions = (width, height)
 
     scaled_image = cv2.resize(mapName, (width, height), interpolation = cv2.INTER_AREA)
     gray = cv2.cvtColor(scaled_image, cv2.COLOR_BGR2GRAY)
-    thresh = cv2.threshold(frame, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
+    mapName = scaled_image[2650:2875, 1075:2500]
+    thresh = cv2.threshold(mapName, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
 
     text = pytesseract.image_to_string(thresh, lang="eng", config="--psm 6 --oem 1")
 
@@ -30,10 +28,9 @@ def grabMapName(frame) -> str:
 
     return text
 
-def grabFeed(frame, second) -> list:
-    #find ROI
+def grabFeed(frame) -> list:
 
-    feed = frame[:, :]
+    feed = frame[1300:2100, 0:1100]
 
     width = int(image.shape[1] * 300 / 100)
     height = int(image.shape[0] * 300 / 100)
@@ -41,21 +38,33 @@ def grabFeed(frame, second) -> list:
     dimensions = (width, height)
 
     scaled_image = cv2.resize(feed, (width, height), interpolation = cv2.INTER_AREA)
-    gray = cv2.cvtColor(scaled_image, cv2.COLOR_BGR2GRAY)
-    blur = cv2.medianBlur(frame, 3)
+    blur = cv2.medianBlur(scaled_image, 3)
 
     text = pytesseract.image_to_string(blur, lang="eng", config="--psm 6 --oem 1")
 
     text = text.split('\n')[:-1]
+    # players format [['clan tag', 'gamertag'], ...]
+    players = []
+    for line in text:
+        if line[0] == '[' or line[4] == ']':
+            players.append(line.split(" ")[:2])
 
-    print(text)
+    return players
 
     if isClip(text):
-        clip_range = [second-5, second+5]
+        if len(text) < 2:
+            return False
+        for i in range(0, len(text)):
+            for j in range(i+1, len(text)):
+                if text[i] == text[j]:
+                    return True
+                else:
+                    if text[i][1] == text[j][1]:
+                        return True
+        return False
+        # clip_range = [second-5, second+5]
 
         # check if a map has been found
         # make sure the map is not the same as well
             # make sure map isnt the same as the last
-        # upload youtube url to db
-
-    return clip_range
+        # upload youtube url to d

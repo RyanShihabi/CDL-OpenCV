@@ -18,6 +18,11 @@ while True:
     # print(frame)
     map = grabMap(frame)
 
+    #figure out a way to store the map for the time being
+        # map should be different from the one before it
+        # Add a check map loop
+        # once video is over, clear map history
+
     if map != "":
         grabFeed(frame, int(fps.elapsed()))
 
