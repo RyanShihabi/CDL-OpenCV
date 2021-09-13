@@ -55,9 +55,9 @@ else:
     gray = scaled_image
 
 if args["detection"] == "map":
-    gray_roi = gray[]
+    gray_roi = gray[20:200,100:300]
 elif args["detection"] == "feed":
-    gray_roi = gray[]
+    gray_roi = gray[20:200,100:300]
 else:
     gray_roi = gray
 
