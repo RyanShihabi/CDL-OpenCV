@@ -55,16 +55,15 @@ else:
     gray = scaled_image
 
 if args["detection"] == "map":
-    gray_roi = gray[20:200,100:300]
+    gray_roi = gray[2650:2875, 1075:2500]
 elif args["detection"] == "feed":
-    gray_roi = gray[20:200,100:300]
+    gray_roi = scaled_image[1300:2100,0:1100]
+    # [1300:2100,0:1000]
 else:
     gray_roi = gray
 
 filename = f"{os.getpid()}.png"
 cv2.imwrite(filename, gray_roi)
-
-
 
 text = pytesseract.image_to_string(Image.open(filename), lang="eng", config="--psm 6 --oem 1")
 os.remove(filename)
@@ -74,7 +73,14 @@ cv2.imshow("Image", image)
 cv2.imshow("Output", gray_roi)
 cv2.waitKey(0)
 
-text = text.split('\n')[:-1]
+if args["detection"] == "map":
+    text = text.split("*")[0]
+if args["detection"] == "feed":
+    text = text.split('\n')[:-1]
+    players = []
+    for line in text:
+        if line[0] == '[':
+            players.append(line.split(" ")[:2])
 
-print(isClip(text))
-print(isClip(['a', 'a']))
+    print(players)
+    print(isClip(players))
