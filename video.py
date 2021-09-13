@@ -6,6 +6,7 @@ from grab import *
 
 ap = ArgumentParser()
 ap.add_argument("-v", "--video", required=True, help="input VOD for clip detection")
+ap.add_argument("-l", "--link", required=True, help="input youtube URL")
 args = vars(ap.parse_args())
 
 video = cv2.VideoCapture(args["video"])
