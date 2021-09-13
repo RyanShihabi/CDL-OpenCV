@@ -6,7 +6,8 @@ import os
 
 ap = argparse.ArgumentParser()
 ap.add_argument("-i", "--image", required=True, help="input image path for OCR")
-ap.add_argument("-p", "--preprocess", type=str, help="method of preprocessing")
+ap.add_argument("-p", "--preprocess", help="method of preprocessing")
+ap.add_argument("-d", "--detection", help="choose text to detect")
 args = vars(ap.parse_args())
 
 image = cv2.imread(args["image"])
@@ -53,8 +54,15 @@ elif args["preprocess"] == "blur":
 else:
     gray = scaled_image
 
+if args["detection"] == "map":
+    gray_roi = gray[]
+elif args["detection"] == "feed":
+    gray_roi = gray[]
+else:
+    gray_roi = gray
+
 filename = f"{os.getpid()}.png"
-cv2.imwrite(filename, gray)
+cv2.imwrite(filename, gray_roi)
 
 
 
@@ -63,7 +71,7 @@ os.remove(filename)
 print(text)
 
 cv2.imshow("Image", image)
-cv2.imshow("Output", gray)
+cv2.imshow("Output", gray_roi)
 cv2.waitKey(0)
 
 text = text.split('\n')[:-1]
