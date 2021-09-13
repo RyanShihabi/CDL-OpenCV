@@ -47,8 +47,12 @@ def grabFeed(image):
 
 gray = cv2.cvtColor(scaled_image, cv2.COLOR_BGR2GRAY)
 
-# Map text detection works best with thresh filter
+# Map text detection works best with blur filter
 # Kill feed text detects best with blur filter
+# figure out if there are better blur methods
+# maybe start using masking to filter out unwanted COLOR
+# test kill feed on multiple scenarios
+    # five players on feed
 
 if args["preprocess"] == "thresh":
     gray = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
