@@ -1,13 +1,12 @@
 import os
+import json
+import datetime
 
-os.system("youtube-dl --flat-playlist PLisfUdjySbZVoTRbAlfObs8dI-cb-gWk- > playlist.txt")
+timestamp = str(datetime.datetime.now())[:10]
 
-num_videos = ""
+os.system(f"youtube-dl --dump-single-json PLisfUdjySbZVoTRbAlfObs8dI-cb-gWk- > {timestamp}.json")
 
-with open("playlist.txt", "r") as f:
-    for i, line in enumerate(f):
-        if i == 3:
-            num_videos = line.split()[-1]
-            break
+#iterate through videos depending on what the playlist requirements provide
 
-print("Videos in playlist: ", num_videos)
+# for i in range(num_videos+1):
+#     os.system("youtube-dl --flat-playlist PLisfUdjySbZVoTRbAlfObs8dI-cb-gWk- > playlist.txt")

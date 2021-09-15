@@ -43,6 +43,7 @@ def grabFeed(frame) -> list:
     text = pytesseract.image_to_string(blur, lang="eng", config="--psm 6 --oem 1")
 
     text = text.split('\n')[:-1]
+
     # players format [['clan tag', 'gamertag'], ...]
     players = []
     for line in text:

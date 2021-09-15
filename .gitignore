@@ -2,5 +2,5 @@
 *.png
 images/
 videos/
-TODO.txt
-playlist.txt
+*.txt
+*.json
