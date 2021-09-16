@@ -1,14 +1,19 @@
 import pytesseract
 import cv2
 
-def isClip(text):
-    if len(text) < 2:
-        return False
-    for i in range(0, len(text)):
-        for j in range(i+1, len(text)):
-            if text[i] == text[j]:
-                return True
-    return False
+def isClip(players):
+    if len(players) < 2:
+        return None
+
+    for i in range(0, len(players)):
+        for j in range(i+1, len(players)):
+            if players[i] == players[j]:
+                return players[i]
+            else:
+                if players[i][1] == players[j][1]:
+                    return players[i]
+
+    return None
 
 def grabMapName(frame, map) -> str:
     #find ROI
@@ -53,22 +58,15 @@ def grabFeed(frame, map) -> list:
         if line[0] == '[' or line[4] == ']':
             players.append(line.split(" ")[:2])
 
-    return players
+    player = isClip(players)
 
-    if isClip(text):
-        if len(text) < 2:
-            return False
-        for i in range(0, len(text)):
-            for j in range(i+1, len(text)):
-                if text[i] == text[j]:
-                    return True
-                else:
-                    if text[i][1] == text[j][1]:
-                        return True
-        return False
-        # clip_range = [second-5, second+5]
+    if player != None:
+        return # {player: player, clip_range: [second-5, second+5]}
+    else:
+        return None
 
-        # check if a map has been found
-        # make sure the map is not the same as well
-            # make sure map isnt the same as the last
-        # upload youtube url to d
+        # return dict object
+            # clip_range = [second-5, second+5]
+            # player
+            # clip range gets added into url on setup
+        # skip a couple of frames to prevent duplicates

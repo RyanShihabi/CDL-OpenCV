@@ -51,6 +51,7 @@ with open("videos/completed.txt", "r+") as f:
 f.close()
 
 maps = []
+clips = {}
 for video in videos:
     if video[0] not in completed_videos:
         # Download format: 1080p60, no audio
@@ -68,7 +69,13 @@ for video in videos:
                 if map != "None":
                     maps.append(map)
 
-                grabFeed(frame, maps[-1])
+                try:
+                    clip = grabFeed(frame, maps[-1])
+                    if clip != None:
+                        data = clip
+                        # add dictionary to a mega dictionary for dump into JSON file
+                except IndexError:
+                    print("No map detected, can't detect feed")
 
                 #keep the name of the map until the next map appears
                 # grabExtra(frame)
