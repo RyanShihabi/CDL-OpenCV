@@ -5,7 +5,6 @@ import json
 import datetime
 from grab import *
 import cv2
-from imutils.video import FPS
 
 playlist = "PLisfUdjySbZVoTRbAlfObs8dI-cb-gWk-"
 
@@ -51,7 +50,7 @@ with open("videos/completed.txt", "r+") as f:
 f.close()
 
 maps = []
-clips = {}
+clips = {"clips": []}
 for video in videos:
     if video[0] not in completed_videos:
         # Download format: 1080p60, no audio
@@ -60,7 +59,6 @@ for video in videos:
         # os.system(f"youtube-dl {video[1]}")
 
         video = cv2.VideoCapture("videos/FaZeTorontoRaid.mp4")
-        fps = FPS().start()
             while video.isOpened():
                 ret, frame = video.read()
                 cv2.imshow("FaZeTorontoRaid", frame)
@@ -70,10 +68,10 @@ for video in videos:
                     maps.append(map)
 
                 try:
-                    clip = grabFeed(frame, maps[-1])
+                    clip = grabFeed(frame, maps[-1], video[1])
                     if clip != None:
-                        data = clip
-                        # add dictionary to a mega dictionary for dump into JSON file
+                        clips["clips"].append(clip)
+                        # skip a couple of frames so same clip isnt detected
                 except IndexError:
                     print("No map detected, can't detect feed")
 
@@ -88,3 +86,8 @@ for video in videos:
             # json file export or download of the video
             # maybe also use a downloaded.txt to determine what videos still need to be downloaded
             # or put both metrics into one file to save space
+
+with open(f"data/processed/clips.json", "w+") as json_file:
+    json.dump(clips, json_file)
+
+json_file.close()

@@ -15,6 +15,9 @@ def isClip(players):
 
     return None
 
+def secondOfFrame(frame):
+    return frame // 60
+
 def grabMapName(frame, map) -> str:
     #find ROI
     width = int(frame.shape[1] * 300 / 100)
@@ -36,7 +39,7 @@ def grabMapName(frame, map) -> str:
     else:
         return text
 
-def grabFeed(frame, map) -> list:
+def grabFeed(frame, map, id) -> list:
 
     feed = frame[1300:2100, 0:1100]
 
@@ -61,12 +64,8 @@ def grabFeed(frame, map) -> list:
     player = isClip(players)
 
     if player != None:
-        return # {player: player, clip_range: [second-5, second+5]}
-    else:
-        return None
+        second = secondOfFrame(frame)
+            return {"player": player, "clip_range": f"https://www.youtube.com/watch?start={second-5}&end={second+5}&v={id}&ab_channel=CallofDutyLeague", "map": map}
+        # Dont need to check if second is less than 5, wont happen games dont start until later
 
-        # return dict object
-            # clip_range = [second-5, second+5]
-            # player
-            # clip range gets added into url on setup
-        # skip a couple of frames to prevent duplicates
+    return None
