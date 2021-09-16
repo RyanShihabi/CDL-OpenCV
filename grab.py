@@ -10,7 +10,7 @@ def isClip(text):
                 return True
     return False
 
-def grabMapName(frame) -> str:
+def grabMapName(frame, map) -> str:
     #find ROI
     width = int(frame.shape[1] * 300 / 100)
     height = int(frame.shape[0] * 300 / 100)
@@ -26,9 +26,12 @@ def grabMapName(frame) -> str:
 
     print(text)
 
-    return text
+    if text not in maps:
+        return "None"
+    else:
+        return text
 
-def grabFeed(frame) -> list:
+def grabFeed(frame, map) -> list:
 
     feed = frame[1300:2100, 0:1100]
 

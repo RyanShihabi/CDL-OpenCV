@@ -12,7 +12,7 @@ args = vars(ap.parse_args())
 video = cv2.VideoCapture(args["video"])
 fps = FPS().start()
 
-while True:
+while video.isOpened():
     ret, frame = video.read()
     cv2.imshow('VOD', frame)
 

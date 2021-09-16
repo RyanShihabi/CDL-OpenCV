@@ -3,8 +3,9 @@ from os import path
 import pathlib
 import json
 import datetime
-
-file_count = 0
+from grab import *
+import cv2
+from imutils.video import FPS
 
 playlist = "PLisfUdjySbZVoTRbAlfObs8dI-cb-gWk-"
 
@@ -29,8 +30,6 @@ while len(dates) > 2:
     os.remove(f"data/playlist/{dates[0]}.json")
     dates.pop(0)
 
-# print("Num of files: ", file_count){value for value in variable}
-
 f = open(f"data/playlist/{timestamp}.json",)
 
 data = json.load(f)
@@ -44,6 +43,41 @@ videos = []
 for i in data["entries"]:
     videos.append([i['title'], i['id']])
 
-# print(videos)
+# once video is downloaded, add to completed.txt
+completed_videos = []
+with open("videos/completed.txt", "r+") as f:
+    for line in f.readlines():
+        completed_videos.append(line)
+f.close()
 
-# once video is downloaded, add to downloaded.txt
+maps = []
+for video in videos:
+    if video[0] not in completed_videos:
+        # Download format: 1080p60, no audio
+        # figure out option commands for format and no audio
+
+        # os.system(f"youtube-dl {video[1]}")
+
+        video = cv2.VideoCapture("videos/FaZeTorontoRaid.mp4")
+        fps = FPS().start()
+            while video.isOpened():
+                ret, frame = video.read()
+                cv2.imshow("FaZeTorontoRaid", frame)
+
+                map = grabMap(frame)
+                if map != "None":
+                    maps.append(map)
+
+                grabFeed(frame, maps[-1])
+
+                #keep the name of the map until the next map appears
+                # grabExtra(frame)
+
+
+            with open("videos/completed.txt", "a+") as f:
+                f.write(video[0])
+            f.close()
+        #determine what metric considers completion
+            # json file export or download of the video
+            # maybe also use a downloaded.txt to determine what videos still need to be downloaded
+            # or put both metrics into one file to save space
