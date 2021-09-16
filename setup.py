@@ -58,9 +58,9 @@ for video in videos:
 
         # os.system(f"youtube-dl {video[1]}")
 
-        video = cv2.VideoCapture("videos/FaZeTorontoRaid.mp4")
-            while video.isOpened():
-                ret, frame = video.read()
+        cap = cv2.VideoCapture("videos/FaZeTorontoRaid.mp4")
+            while cap.isOpened():
+                ret, frame = cap.read()
                 cv2.imshow("FaZeTorontoRaid", frame)
 
                 map = grabMap(frame)
@@ -71,7 +71,8 @@ for video in videos:
                     clip = grabFeed(frame, maps[-1], video[1])
                     if clip != None:
                         clips["clips"].append(clip)
-                        # skip a couple of frames so same clip isnt detected
+                        cap.set(cv2.CAP_PROP_POS_FRAMES, )
+                        # skip five seconds worth of frames as clips range 5 seconds back and forward
                 except IndexError:
                     print("No map detected, can't detect feed")
 
