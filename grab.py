@@ -35,32 +35,49 @@ def grabMapName(frame) -> str:
             return map
     return "None"
 
-def grabFeed(frame, map, id) -> list:
+def grabFeed(frame, map, id, fts) -> list:
+    #720p roi
 
-    feed = frame[1300:2100, 0:1100]
+    # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-    width = int(frame.shape[1] * 300 / 100)
-    height = int(frame.shape[0] * 300 / 100)
+    #just in case [375:475, 0:275]
+    feed_roi = frame[380:470, 0:275]
 
-    dimensions = (width, height)
+    feed_roi = cv2.medianBlur(feed_roi, 1)
 
-    scaled_image = cv2.resize(frame, (width, height), interpolation = cv2.INTER_AREA)
-    blur = cv2.medianBlur(scaled_image, 3)
+    width = int(feed_roi.shape[1] * 300 / 100)
+    height = int(feed_roi.shape[0] * 300 / 100)
 
-    text = pytesseract.image_to_string(blur, lang="eng", config="--psm 6 --oem 1")
+    cv2.imshow("feed", feed_roi)
+
+    feed_roi = cv2.resize(feed_roi, (width, height), interpolation = cv2.INTER_AREA)
+
+    # feed = frame[1300:2100, 0:1100]
+    #
+    # width = int(frame.shape[1] * 300 / 100)
+    # height = int(frame.shape[0] * 300 / 100)
+    #
+    # dimensions = (width, height)
+    #
+    # scaled_image = cv2.resize(frame, (width, height), interpolation = cv2.INTER_AREA)
+    # blur = cv2.medianBlur(scaled_image, 3)
+
+    text = pytesseract.image_to_string(feed_roi, lang="eng", config="--psm 6 --oem 1")
 
     text = text.split('\n')[:-1]
+
+    print(text)
 
     # players format [['clan tag', 'gamertag'], ...]
     players = []
     for line in text:
-        if line[0] == '[' or line[4] == ']':
+        if line[0] in ['[', '('] or line[4] in [']', ')']:
             players.append(line.split(" ")[:2])
 
     player = isClip(players)
 
     if player != None:
-        second = secondOfFrame(frame)
+        second = secondOfFrame(fts)
         return {"player": player, "clip_range": f"https://www.youtube.com/watch?start={second-5}&end={second+5}&v={id}&ab_channel=CallofDutyLeague", "map": map}
         # Dont need to check if second is less than 5, wont happen games dont start until later
 

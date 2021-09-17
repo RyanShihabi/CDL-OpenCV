@@ -1,6 +1,7 @@
 from PIL import Image
 import pytesseract
 import argparse
+import numpy
 import cv2
 import os
 
@@ -11,13 +12,14 @@ args = vars(ap.parse_args())
 
 image = cv2.imread(args["image"])
 
+# roi = image[350:475, 0:125]
+#
+# cv2.imshow("test", roi)
+
 print((image.shape[1], image.shape[0]))
 
 # try resizing the image to get broader pixel values
 # You only need to look on the left side of the kill feed. That determines a clip
-
-gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
 # Map text detection works best with blur filter
 # Kill feed text detects best with blur filter
 # figure out if there are better blur methods
@@ -27,25 +29,37 @@ gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 if args["detection"] == "map":
     #720p roi
-    map_roi = image[585:640, 240:550]
-    gray = cv2.cvtColor(map_roi, cv2.COLOR_BGR2GRAY)
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    map_roi = gray[585:640, 240:550]
 
-elif args["detection"] == "feed":
+    filename = f"{os.getpid()}.png"
+    cv2.imwrite(filename, map_roi)
+    cv2.imshow("Output", map_roi)
+
+if args["detection"] == "feed":
     #720p roi
-    # gray_roi = scaled_image[,]
-    pass
-else:
-    gray_roi = gray
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-filename = f"{os.getpid()}.png"
-cv2.imwrite(filename, gray)
+    # thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
+    feed_roi = gray[375:475, 0:275]
+
+    feed_roi = cv2.medianBlur(feed_roi, 1)
+
+    width = int(feed_roi.shape[1] * 300 / 100)
+    height = int(feed_roi.shape[0] * 300 / 100)
+
+    feed_roi = cv2.resize(feed_roi, (width, height), interpolation = cv2.INTER_AREA)
+
+    filename = f"{os.getpid()}.png"
+    cv2.imwrite(filename, feed_roi)
+    cv2.imshow("Output", feed_roi)
 
 text = pytesseract.image_to_string(Image.open(filename), lang="eng", config="--psm 6 --oem 1")
 os.remove(filename)
 print(text)
 
 # cv2.imshow("Image", image)
-cv2.imshow("Output", gray)
+# cv2.imshow("Output", gray)
 cv2.waitKey(0)
 
 if args["detection"] == "map":
@@ -55,9 +69,9 @@ if args["detection"] == "feed":
     # players format [['clan tag', 'gamertag'], ...]
     players = []
     for line in text:
-        if line[0] == '[':
+        if line[0] in ['[', '(']:
             players.append(line.split(" ")[:2])
 
     print(players)
-    print(isClip(players))
+    # print(isClip(players))
     # print(isClip([['[ATL]', 'gamertag'], ['(Atl]', 'gamertag']]))
