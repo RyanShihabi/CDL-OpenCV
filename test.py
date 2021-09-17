@@ -16,7 +16,11 @@ scale = 300
 width = int(image.shape[1] * scale / 100)
 height = int(image.shape[0] * scale / 100)
 
+print((image.shape[1], image.shape[0]))
+
 dimensions = (width, height)
+
+print(dimensions)
 
 scaled_image = cv2.resize(image, (width, height), interpolation = cv2.INTER_AREA)
 
@@ -62,9 +66,18 @@ else:
     gray = scaled_image
 
 if args["detection"] == "map":
-    gray_roi = gray[2650:2875, 1075:2500]
+    # 1080p roi
+    # gray_roi = gray[2650:2875, 1075:2500]
+
+    #720p roi
+    gray_roi = gray[1750:1910, 710:1600]
+
 elif args["detection"] == "feed":
-    gray_roi = scaled_image[1300:2100,0:1100]
+    #1080p roi
+    gray_roi = scaled_image[1300:2100, 0:1100]
+
+    #720p roi
+    # gray_roi = scaled_image[,]
 else:
     gray_roi = gray
 
@@ -80,7 +93,7 @@ cv2.imshow("Output", gray_roi)
 cv2.waitKey(0)
 
 if args["detection"] == "map":
-    text = text.split("*")[0]
+    text = text.split("-")[0]
 if args["detection"] == "feed":
     text = text.split('\n')[:-1]
     # players format [['clan tag', 'gamertag'], ...]

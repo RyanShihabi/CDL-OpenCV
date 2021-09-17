@@ -57,10 +57,10 @@ for video in videos:
         # Trying 720p30 with no audio to see if performance increases
             # using format code 136 from youtube-dl
         # figure out option commands for format and no audio
+        if path.isfile(f"{video[0]}.mp4") == False;
+            os.system(f"youtube-dl -f 136 {video[1]}")
 
-        # os.system(f"youtube-dl -f 136 {video[1]}")
-
-        cap = cv2.VideoCapture("videos/FaZeTorontoRaid.mp4")
+        cap = cv2.VideoCapture(f"videos/{video[0]}.mp4")
         frame_count = 0
             while cap.isOpened():
                 ret, frame = cap.read()

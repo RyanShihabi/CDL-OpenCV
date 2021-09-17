@@ -26,11 +26,18 @@ def grabMapName(frame) -> str:
     height = int(frame.shape[0] * 300 / 100)
 
     dimensions = (width, height)
+    # print(dimensions)
 
     scaled_image = cv2.resize(frame, (width, height), interpolation = cv2.INTER_AREA)
     gray = cv2.cvtColor(scaled_image, cv2.COLOR_BGR2GRAY)
-    mapName = gray[2650:2875, 1075:2500]
+    # 1080
+    # mapName = gray[2650:2875, 1075:2500]
+
+    # 720
+    mapName = gray[1750:1910, 710:1600]
     thresh = cv2.threshold(mapName, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
+
+    # print((thresh.shape[0], thresh.shape[1]))
 
     text = pytesseract.image_to_string(thresh, lang="eng", config="--psm 6 --oem 1")
 
