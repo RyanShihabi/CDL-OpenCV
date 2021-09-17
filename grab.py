@@ -19,30 +19,14 @@ def secondOfFrame(frame):
     return frame // 30
 
 def grabMapName(frame) -> str:
-    #find ROI
-    maps = ["RAID"]
+    maps = ["RAID", "GARRISON"]
 
-    # find the roi of the standard image
-    # then scale it up for better detection
-
-    width = int(frame.shape[1] * 300 / 100)
-    height = int(frame.shape[0] * 300 / 100)
-
-    dimensions = (width, height)
-    # print(dimensions)
-
-    scaled_image = cv2.resize(frame, (width, height), interpolation = cv2.INTER_AREA)
-    gray = cv2.cvtColor(scaled_image, cv2.COLOR_BGR2GRAY)
-    # 1080
-    # mapName = gray[2650:2875, 1075:2500]
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
     # 720
-    mapName = gray[1750:1910, 710:1600]
-    thresh = cv2.threshold(mapName, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
+    mapName = gray[585:640, 240:550]
 
-    # print((thresh.shape[0], thresh.shape[1]))
-
-    text = pytesseract.image_to_string(thresh, lang="eng", config="--psm 6 --oem 1")
+    text = pytesseract.image_to_string(mapName, lang="eng", config="--psm 6 --oem 1")
 
     text = text.split(" ")[0]
 
