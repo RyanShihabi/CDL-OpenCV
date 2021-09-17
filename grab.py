@@ -16,11 +16,14 @@ def isClip(players):
     return None
 
 def secondOfFrame(frame):
-    return frame // 60
+    return frame // 30
 
 def grabMapName(frame) -> str:
     #find ROI
     maps = ["RAID"]
+
+    # find the roi of the standard image
+    # then scale it up for better detection
 
     width = int(frame.shape[1] * 300 / 100)
     height = int(frame.shape[0] * 300 / 100)
