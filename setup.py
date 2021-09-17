@@ -54,11 +54,14 @@ clips = {"clips": []}
 for video in videos:
     if video[0] not in completed_videos:
         # Download format: 1080p60, no audio
+        # Trying 720p30 with no audio to see if performance increases
+            # using format code 136 from youtube-dl
         # figure out option commands for format and no audio
 
-        # os.system(f"youtube-dl {video[1]}")
+        # os.system(f"youtube-dl -f 136 {video[1]}")
 
         cap = cv2.VideoCapture("videos/FaZeTorontoRaid.mp4")
+        frame_count = 0
             while cap.isOpened():
                 ret, frame = cap.read()
                 cv2.imshow("FaZeTorontoRaid", frame)
@@ -71,11 +74,12 @@ for video in videos:
                     clip = grabFeed(frame, maps[-1], video[1])
                     if clip != None:
                         clips["clips"].append(clip)
-                        cap.set(cv2.CAP_PROP_POS_FRAMES, )
+                        cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count += 300)
                         # skip five seconds worth of frames as clips range 5 seconds back and forward
                 except IndexError:
                     print("No map detected, can't detect feed")
 
+                frame_count += 1
                 #keep the name of the map until the next map appears
                 # grabExtra(frame)
 
