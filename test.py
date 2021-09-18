@@ -14,7 +14,6 @@ image = cv2.imread(args["image"])
 
 # roi = image[350:475, 0:125]
 #
-# cv2.imshow("test", roi)
 
 print((image.shape[1], image.shape[0]))
 
@@ -38,10 +37,10 @@ if args["detection"] == "map":
 
 if args["detection"] == "feed":
     #720p roi
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
     # thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
-    feed_roi = gray[375:475, 0:275]
+    feed_roi = image[300:475, 0:275]
 
     feed_roi = cv2.medianBlur(feed_roi, 1)
 

@@ -1,4 +1,5 @@
 import pytesseract
+import numpy as np
 import cv2
 
 def isClip(players):
@@ -39,18 +40,33 @@ def grabFeed(frame, map, id, fts) -> list:
     #720p roi
 
     # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    # bn = cv2.bitwise_not(frame)
+
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+    lower_red = np.array([5, 0, 35])
+    upper_red = np.array([15, 100, 105])
+
+    mask = cv2.inRange(hsv, lower_red, upper_red)
+    # res = cv2.bitwise_and(frame, frame, mask=mask)
+
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    # thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
 
     #just in case [375:475, 0:275]
-    feed_roi = frame[380:470, 0:275]
+    feed_roi = mask[350:450, 0:275]
 
-    feed_roi = cv2.medianBlur(feed_roi, 1)
+    # feed_roi = cv2.medianBlur(feed_roi, 1)
+
+    feed_roi = cv2.GaussianBlur(feed_roi, (1, 1), cv2.IMREAD_UNCHANGED)
 
     width = int(feed_roi.shape[1] * 300 / 100)
     height = int(feed_roi.shape[0] * 300 / 100)
 
-    cv2.imshow("feed", feed_roi)
-
     feed_roi = cv2.resize(feed_roi, (width, height), interpolation = cv2.INTER_AREA)
+
+    cv2.imshow("feed", feed_roi)
 
     # feed = frame[1300:2100, 0:1100]
     #
@@ -71,7 +87,7 @@ def grabFeed(frame, map, id, fts) -> list:
     # players format [['clan tag', 'gamertag'], ...]
     players = []
     for line in text:
-        if line[0] in ['[', '('] or line[4] in [']', ')']:
+        if line[0] in ['[', '(', '|'] or line[4] in [']', ')', '|']:
             players.append(line.split(" ")[:2])
 
     player = isClip(players)
