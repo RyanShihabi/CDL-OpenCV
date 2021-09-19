@@ -29,7 +29,10 @@ print((image.shape[1], image.shape[0]))
 if args["detection"] == "map":
     #720p roi
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    map_roi = gray[585:640, 240:550]
+    # map_roi = gray[585:640, 240:550]
+
+    #1080
+    map_roi = gray[875:975, 345:900]
 
     filename = f"{os.getpid()}.png"
     cv2.imwrite(filename, map_roi)
@@ -50,7 +53,7 @@ if args["detection"] == "feed":
     feed_roi = cv2.resize(feed_roi, (width, height), interpolation = cv2.INTER_AREA)
 
     filename = f"{os.getpid()}.png"
-    cv2.imwrite(filename, feed_roi)
+    cv2.imwrite(filename, feed_roaptivecv2._THREi)
     cv2.imshow("Output", feed_roi)
 
 text = pytesseract.image_to_string(Image.open(filename), lang="eng", config="--psm 6 --oem 1")

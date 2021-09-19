@@ -2,99 +2,113 @@ import pytesseract
 import numpy as np
 import cv2
 
-def isClip(players):
-    if len(players) < 2:
+class Grab:
+    def __init__(self, bounds):
+        self.bounds = bounds
+        print(self.bounds)
+
+    def isClip(self, players) -> list:
+        if len(players) < 2:
+            return None
+
+        for i in range(0, len(players)):
+            for j in range(i+1, len(players)):
+                if players[i] == players[j]:
+                    return players[i]
+                else:
+                    if players[i][1] == players[j][1]:
+                        return players[i]
+
         return None
 
-    for i in range(0, len(players)):
-        for j in range(i+1, len(players)):
-            if players[i] == players[j]:
-                return players[i]
-            else:
-                if players[i][1] == players[j][1]:
-                    return players[i]
+    def secondOfFrame(self, frame) -> int:
+        return frame // 60
 
-    return None
+    def grabTeams(self, title) -> list:
+    # "Champs Final | @Toronto Ultra vs @Atlanta FaZe | Championship Weekend | Day 4"
+        teams = title.split("|")[1].split("@")[1:]
+        return [teams[0][:-4], teams[1][:-1]]
 
-def secondOfFrame(frame):
-    return frame // 30
+    def grabMapName(self, frame) -> str:
+        maps = ["RAID", "GARRISON"]
 
-def grabMapName(frame) -> str:
-    maps = ["RAID", "GARRISON"]
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        #720
+        # mapName = gray[585:640, 240:550]
 
-    # 720
-    mapName = gray[585:640, 240:550]
+        #1080
+        mapName = gray[875:975, 345:900]
 
-    text = pytesseract.image_to_string(mapName, lang="eng", config="--psm 6 --oem 1")
+        text = pytesseract.image_to_string(mapName, lang="eng", config="--psm 6 --oem 1")
 
-    text = text.split(" ")[0]
+        text = text.split(" ")[0]
 
-    for map in maps:
-        if text == map:
-            return map
-    return "None"
+        for map in maps:
+            if text == map:
+                return map
+        return "None"
 
-def grabFeed(frame, map, id, fts) -> list:
-    #720p roi
+    def grabFeed(self, frame, map, id, fts) -> dict:
+        #720 roi
+        # feed_roi = frame[350:500, 0:275]
 
-    # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    # bn = cv2.bitwise_not(frame)
+        #1080 roi
+        feed_roi = frame[500:700, 0:175]
 
-    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        width = int(feed_roi.shape[1] * 200 / 100)
+        height = int(feed_roi.shape[0] * 200 / 100)
 
-    lower_red = np.array([5, 0, 35])
-    upper_red = np.array([15, 100, 105])
+        feed_roi = cv2.resize(feed_roi, (width, height), interpolation = cv2.INTER_AREA)
 
-    mask = cv2.inRange(hsv, lower_red, upper_red)
-    # res = cv2.bitwise_and(frame, frame, mask=mask)
+        hsv = cv2.cvtColor(feed_roi, cv2.COLOR_BGR2HSV)
 
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        team1_lower = self.bounds[0][0]
+        team1_upper = self.bounds[0][1]
 
-    # thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+        mask_team1 = cv2.inRange(hsv, team1_lower, team1_upper)
 
-    #just in case [375:475, 0:275]
-    feed_roi = mask[350:450, 0:275]
+        team2_lower = self.bounds[1][0]
+        team2_upper = self.bounds[1][1]
 
-    # feed_roi = cv2.medianBlur(feed_roi, 1)
+        mask_team2 = cv2.inRange(hsv, team2_lower, team2_upper)
 
-    feed_roi = cv2.GaussianBlur(feed_roi, (1, 1), cv2.IMREAD_UNCHANGED)
+        mask = mask_team1 | mask_team2
 
-    width = int(feed_roi.shape[1] * 300 / 100)
-    height = int(feed_roi.shape[0] * 300 / 100)
+        res = cv2.bitwise_or(feed_roi, feed_roi, mask=mask_team2)
 
-    feed_roi = cv2.resize(feed_roi, (width, height), interpolation = cv2.INTER_AREA)
+        blur = cv2.medianBlur(res, 1)
 
-    cv2.imshow("feed", feed_roi)
+        gray = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
 
-    # feed = frame[1300:2100, 0:1100]
-    #
-    # width = int(frame.shape[1] * 300 / 100)
-    # height = int(frame.shape[0] * 300 / 100)
-    #
-    # dimensions = (width, height)
-    #
-    # scaled_image = cv2.resize(frame, (width, height), interpolation = cv2.INTER_AREA)
-    # blur = cv2.medianBlur(scaled_image, 3)
+        thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 21, 2)
 
-    text = pytesseract.image_to_string(feed_roi, lang="eng", config="--psm 6 --oem 1")
+        kernel = np.ones((3,3), np.uint8)
+        erosion = cv2.erode(thresh, kernel, iterations=1)
+        # opening = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel)
+        # gradient = cv2.morphologyEx(thresh, cv2.MORPH_GRADIENT, kernel)
 
-    text = text.split('\n')[:-1]
+        cv2.imshow("feed", erosion)
 
-    print(text)
+        text = pytesseract.image_to_string(erosion, lang="eng", config="--psm 6 --oem 1")
 
-    # players format [['clan tag', 'gamertag'], ...]
-    players = []
-    for line in text:
-        if line[0] in ['[', '(', '|'] or line[4] in [']', ')', '|']:
-            players.append(line.split(" ")[:2])
+        text = text.split('\n')[:-1]
 
-    player = isClip(players)
+        print(text)
 
-    if player != None:
-        second = secondOfFrame(fts)
-        return {"player": player, "clip_range": f"https://www.youtube.com/watch?start={second-5}&end={second+5}&v={id}&ab_channel=CallofDutyLeague", "map": map}
-        # Dont need to check if second is less than 5, wont happen games dont start until later
+        # players format [['clan tag', 'gamertag'], ...]
+        players = []
+        for line in text:
+            if len(line) > 4:
+                if line[0] in ['[', '(', '|', '{'] or line[4] in [']', ')', '|', '}']:
+                    players.append(line.split(" ")[:2])
 
-    return None
+        # print(players)
+        player = self.isClip(players)
+
+        if player != None:
+            second = self.secondOfFrame(fts)
+            return {"player": player, "clip_range": f"https://www.youtube.com/watch?start={second-5}&end={second+5}&v={id}&ab_channel=CallofDutyLeague", "map": map}
+            # Dont need to check if second is less than 5, wont happen games dont start until later
+
+        return None
