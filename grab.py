@@ -75,13 +75,13 @@ class Grab:
 
         mask = mask_team1 | mask_team2
 
-        res = cv2.bitwise_or(feed_roi, feed_roi, mask=mask_team2)
+        res = cv2.bitwise_or(feed_roi, feed_roi, mask=mask)
 
         blur = cv2.medianBlur(res, 1)
 
         gray = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
 
-        thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 21, 2)
+        thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 71, 1)
 
         kernel = np.ones((3,3), np.uint8)
         erosion = cv2.erode(thresh, kernel, iterations=1)
@@ -101,6 +101,7 @@ class Grab:
         for line in text:
             if len(line) > 4:
                 if line[0] in ['[', '(', '|', '{'] or line[4] in [']', ')', '|', '}']:
+                    # make it so the brackets dont make it into the clan abbreviation
                     players.append(line.split(" ")[:2])
 
         # print(players)

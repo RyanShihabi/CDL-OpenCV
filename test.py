@@ -53,8 +53,8 @@ if args["detection"] == "feed":
     feed_roi = cv2.resize(feed_roi, (width, height), interpolation = cv2.INTER_AREA)
 
     filename = f"{os.getpid()}.png"
-    cv2.imwrite(filename, feed_roaptivecv2._THREi)
-    cv2.imshow("Output", feed_roi)
+    cv2.imwrite(filename, feed_roaptivecv2._THREi   )
+np. thersh   cv2.imshow("Output", feed_roi)
 
 text = pytesseract.image_to_string(Image.open(filename), lang="eng", config="--psm 6 --oem 1")
 os.remove(filename)
