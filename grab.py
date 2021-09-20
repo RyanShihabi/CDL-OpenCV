@@ -68,11 +68,14 @@ class Grab:
 
         mask_team1 = cv2.inRange(feed_roi, team1_lower, team1_upper)
 
-        res = cv2.bitwise_or(feed_roi, feed_roi, mask=mask_team1)
+        res = cv2.bitwise_and(feed_roi, feed_roi, mask=mask_team1)
 
         gray = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
 
         blur = cv2.medianBlur(gray, 1)
+
+        #OTSU
+        # thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
 
         thresh = cv2.adaptiveThreshold(blur, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 71, 1)
 
@@ -85,7 +88,7 @@ class Grab:
 
         hls = cv2.cvtColor(feed_roi, cv2.COLOR_BGR2HLS)
 
-        light = hls[:,:,1]
+        light = hls[:, :, 1]
 
         team2_lower = self.bounds[0][0]
         team2_upper = self.bounds[0][1]
@@ -96,7 +99,10 @@ class Grab:
 
         gray = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
 
+        # Otsu's threshold experimentation
         thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 71, 1)
+
+        # thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 71, 1)
 
         cv2.imshow("Toronto Ultra", thresh)
 
@@ -111,11 +117,6 @@ class Grab:
         textHLS = textHLS.split('\n')[:-1]
 
         text.append(textHLS)
-
-        cv2.imshow("Feed", feed_roi)
-
-        text = pytesseract.image_to_string(feed_roi, lang="eng", config="--psm 6 --oem 1")
-        text = text.split('\n')[:-1]
 
         print(text)
 
