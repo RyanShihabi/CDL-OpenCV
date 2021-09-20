@@ -53,6 +53,8 @@ class Grab:
         #720 roi
         # feed_roi = frame[350:500, 0:275]
 
+        text = []
+
         #1080 roi
         feed_roi = frame[500:700, 0:175]
 
@@ -61,44 +63,66 @@ class Grab:
 
         feed_roi = cv2.resize(feed_roi, (width, height), interpolation = cv2.INTER_AREA)
 
-        hsv = cv2.cvtColor(feed_roi, cv2.COLOR_BGR2HSV)
+        team1_lower = self.bounds[1][0]
+        team1_upper = self.bounds[1][1]
 
-        team1_lower = self.bounds[0][0]
-        team1_upper = self.bounds[0][1]
+        mask_team1 = cv2.inRange(feed_roi, team1_lower, team1_upper)
 
-        mask_team1 = cv2.inRange(hsv, team1_lower, team1_upper)
+        res = cv2.bitwise_or(feed_roi, feed_roi, mask=mask_team1)
 
-        team2_lower = self.bounds[1][0]
-        team2_upper = self.bounds[1][1]
+        gray = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
 
-        mask_team2 = cv2.inRange(hsv, team2_lower, team2_upper)
+        blur = cv2.medianBlur(gray, 1)
 
-        mask = mask_team1 | mask_team2
+        thresh = cv2.adaptiveThreshold(blur, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 71, 1)
 
-        res = cv2.bitwise_or(feed_roi, feed_roi, mask=mask)
+        cv2.imshow("Atlanta FaZe", thresh)
 
-        blur = cv2.medianBlur(res, 1)
+        textBGR = pytesseract.image_to_string(thresh, lang="eng", config="--psm 6 --oem 1")
+        textBGR = textBGR.split('\n')[:-1]
+
+        text.append(textBGR)
+
+        hls = cv2.cvtColor(feed_roi, cv2.COLOR_BGR2HLS)
+
+        light = hls[:,:,1]
+
+        team2_lower = self.bounds[0][0]
+        team2_upper = self.bounds[0][1]
+
+        mask_team2 = cv2.inRange(hls, team2_lower, team2_upper)
+
+        res = cv2.bitwise_or(feed_roi, feed_roi, mask=mask_team2)
 
         gray = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
 
         thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 71, 1)
 
-        kernel = np.ones((3,3), np.uint8)
-        erosion = cv2.erode(thresh, kernel, iterations=1)
+        cv2.imshow("Toronto Ultra", thresh)
+
+        # kernel = np.ones((3,3), np.uint8)
+        # erosion = cv2.erode(thresh, kernel, iterations=1)
         # opening = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel)
         # gradient = cv2.morphologyEx(thresh, cv2.MORPH_GRADIENT, kernel)
 
-        cv2.imshow("feed", erosion)
+        # cv2.imshow("feed", erosion)
 
-        text = pytesseract.image_to_string(erosion, lang="eng", config="--psm 6 --oem 1")
+        textHLS = pytesseract.image_to_string(thresh, lang="eng", config="--psm 6 --oem 1")
+        textHLS = textHLS.split('\n')[:-1]
 
+        text.append(textHLS)
+
+        cv2.imshow("Feed", feed_roi)
+
+        text = pytesseract.image_to_string(feed_roi, lang="eng", config="--psm 6 --oem 1")
         text = text.split('\n')[:-1]
 
         print(text)
 
         # players format [['clan tag', 'gamertag'], ...]
         players = []
-        for line in text:
+        # for lines in text:
+        for line in lines:
             if len(line) > 4:
                 if line[0] in ['[', '(', '|', '{'] or line[4] in [']', ')', '|', '}']:
                     # make it so the brackets dont make it into the clan abbreviation
