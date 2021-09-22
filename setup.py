@@ -8,17 +8,17 @@ import grab
 import cv2
 
 teams = {"Toronto Ultra": {"bounds": [np.array([0, 175, 0]), np.array([255, 255, 255])], "color_space": "HLS"},
-        "Atlanta FaZe": {"bounds": [np.array([65, 72, 110]), np.array([119, 133, 206])], "color_space": "BGR"},
-        "Dallas Empire": {"bounds": [], "color_space": "BGR"},
-        "Florida Mutineers": {"bounds": [], "color_space": "BGR"},
-        "London Royal Ravens": {"bounds": [], "color_space": "BGR"},
-        "Los Angeles Guerrillas": {"bounds": [], "color_space": "BGR"},
-        "Los Angeles Thieves": {"bounds": [], "color_space": "BGR"},
-        "Minnesota ": {"bounds": [], "color_space": "BGR"},
-        "New York Subliners": {"bounds": [], "color_space": "BGR"},
-        "Paris Legion": {"bounds": [], "color_space": "BGR"},
-        "Seattle Surge": {"bounds": [], "color_space": "BGR"},
-        "Optic Chicago": {"bounds": [], "color_space": "BGR"}}
+        "Atlanta FaZe": {"bounds": [np.array([65, 72, 110]), np.array([119, 133, 206])], "color_space": "BGR"}}
+        # "Dallas Empire": {"bounds": [], "color_space": "BGR"},
+        # "Florida Mutineers": {"bounds": [], "color_space": "BGR"},
+        # "London Royal Ravens": {"bounds": [], "color_space": "BGR"},
+        # "Los Angeles Guerrillas": {"bounds": [], "color_space": "BGR"},
+        # "Los Angeles Thieves": {"bounds": [], "color_space": "BGR"},
+        # "Minnesota ": {"bounds": [], "color_space": "BGR"},
+        # "New York Subliners": {"bounds": [], "color_space": "BGR"},
+        # "Paris Legion": {"bounds": [], "color_space": "BGR"},
+        # "Seattle Surge": {"bounds": [], "color_space": "BGR"},
+        # "Optic Chicago": {"bounds": [], "color_space": "BGR"}}
 
 teamHSV = {"Toronto Ultra": [np.array([0, 0, 177], np.uint8), np.array([179, 55, 255], np.uint8)],
             "Atlanta FaZe": [np.array([0, 68, 120], np.uint8), np.array([179, 205, 255], np.uint8)]}
@@ -72,7 +72,7 @@ def main():
             completed_videos.append(line)
     f.close()
 
-    maps = []
+    maps = ""
     clips = {"clips": []}
     for video in videos:
         if video[0] not in completed_videos:
@@ -91,12 +91,17 @@ def main():
                     ret, frame = cap.read()
                     cv2.imshow("FaZeTorontoRaid", frame)
 
+                    # find a way to not ping the map continuously, do once finished with entire program
                     map = grab.grabMap(frame)
+
                     if map != "None":
                         maps.append(map)
+                        map_current = map
 
                     try:
                         clip = grab.grabFeed(frame, maps[-1], video[1])
+                        # clip = grab.grabFeed(frame, map_current, video[1])
+
                         if clip != None:
                             clips["clips"].append(clip)
                             cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count += 300)
@@ -105,8 +110,6 @@ def main():
                         print("No map detected, can't detect feed")
 
                     frame_count += 1
-                    #keep the name of the map until the next map appears
-                    # grabExtra(frame)
 
 
                 with open("videos/completed.txt", "a+") as f:

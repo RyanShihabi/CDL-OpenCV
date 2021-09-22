@@ -65,6 +65,33 @@ if args["detection"] == "timer":
     cv2.imwrite(filename, feed_roi)
     cv2.imshow("Output", feed_roi)
 
+if args["detection"] == "color":
+    colors = []
+
+    team1_roi = image[25:60, 300:350]
+    team1 = [team1_roi[0, 0], team1_roi[34, 49]]
+
+    if (team1[0][0] >= 255-55) and (team1[0][1] >= 255-55) and (team1[0][2] >= 255-55):
+        colors.append({"bounds": team1, "color_space": "HLS"})
+    else:
+        colors.append({"bounds": team1, "color_space": "BGR"})
+
+    team2_roi = image[25:60, 1550:1600]
+    team2 = [team2_roi[0, 0], team2_roi[34, 49]]
+
+    if (team2[0][0] >= 255-55) and (team2[0][1] >= 255-55) and (team2[0][2] >= 255-55):
+        colors.append({"bounds": team2, "color_space": "HLS"})
+    else:
+        colors.append({"bounds": team2, "color_space": "BGR"})
+
+    print(colors)
+
+    cv2.imshow("team1", team1_roi)
+
+    cv2.imshow("team2", team2_roi)
+
+    cv2.waitKey(0)
+
 text = pytesseract.image_to_string(Image.open(filename), lang="eng", config="--psm 6 --oem 1")
 os.remove(filename)
 print(text)

@@ -1,5 +1,6 @@
 import pytesseract
 import numpy as np
+from numpy.linalg import norm
 import cv2
 
 class Grab:
@@ -22,6 +23,29 @@ class Grab:
 
     def secondOfFrame(self, frame) -> int:
         return frame // 60
+
+    def grabTeamColors(self, frame) -> list:
+        bounds = 
+        colors = []
+
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        # find rois
+        team1_color = frame[:, :]
+        team2_color = frame[:, :]
+
+        b, g, r = team1_color
+
+        # figure out how to
+
+
+        colors.append(np.array(b, g, r))
+
+        b, g, r = team2_color
+        colors.append(np.array(b, g, r))
+
+        return colors
+
+
 
     def grabTeams(self, title) -> list:
     # "Champs Final | @Toronto Ultra vs @Atlanta FaZe | Championship Weekend | Day 4"
@@ -108,10 +132,8 @@ class Grab:
 
         gray = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
 
-        # Otsu's threshold experimentation
         thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 71, 1)
 
-        # thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 71, 1)
 
         cv2.imshow("Toronto Ultra", thresh)
 
