@@ -7,6 +7,19 @@ import numpy as np
 import grab
 import cv2
 
+teams = {"Toronto Ultra": {"bounds": [np.array([0, 175, 0]), np.array([255, 255, 255])], "color_space": "HLS"},
+        "Atlanta FaZe": {"bounds": [np.array([65, 72, 110]), np.array([119, 133, 206])], "color_space": "BGR"},
+        "Dallas Empire": {"bounds": [], "color_space": "BGR"},
+        "Florida Mutineers": {"bounds": [], "color_space": "BGR"},
+        "London Royal Ravens": {"bounds": [], "color_space": "BGR"},
+        "Los Angeles Guerrillas": {"bounds": [], "color_space": "BGR"},
+        "Los Angeles Thieves": {"bounds": [], "color_space": "BGR"},
+        "Minnesota ": {"bounds": [], "color_space": "BGR"},
+        "New York Subliners": {"bounds": [], "color_space": "BGR"},
+        "Paris Legion": {"bounds": [], "color_space": "BGR"},
+        "Seattle Surge": {"bounds": [], "color_space": "BGR"},
+        "Optic Chicago": {"bounds": [], "color_space": "BGR"}}
+
 teamHSV = {"Toronto Ultra": [np.array([0, 0, 177], np.uint8), np.array([179, 55, 255], np.uint8)],
             "Atlanta FaZe": [np.array([0, 68, 120], np.uint8), np.array([179, 205, 255], np.uint8)]}
 
@@ -65,12 +78,12 @@ def main():
         if video[0] not in completed_videos:
             hsv_values = grabTeamHSV(video[0])
             grab = Grab(hsv_values)
-            # Trying 720p30 with no audio to see if performance increases
-                #feeds may need 1080: TBD
-                # using format code 136 from youtube-dl
+            # Trying 720p30 with no audio to see if performance increases format code 136
+            # Feeds may need 1080: yes format code 299
             # figure out option commands for format and no audio
             if path.isfile(f"{video[0]}.mp4") == False;
-                os.system(f"youtube-dl -f 136 {video[1]}")
+                os.system(f"youtube-dl -f 299 {video[1]}")
+
 
             cap = cv2.VideoCapture(f"videos/{video[0]}.mp4")
             frame_count = 0
@@ -103,7 +116,6 @@ def main():
                 # json file export or download of the video
                 # maybe also use a downloaded.txt to determine what videos still need to be downloaded
                 # or put both metrics into one file to save space
-
     with open(f"data/processed/clips.json", "w+") as json_file:
         json.dump(clips, json_file)
 

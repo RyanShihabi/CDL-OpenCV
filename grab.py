@@ -5,7 +5,6 @@ import cv2
 class Grab:
     def __init__(self, bounds):
         self.bounds = bounds
-        print(self.bounds)
 
     def isClip(self, players) -> list:
         if len(players) < 2:
@@ -48,6 +47,16 @@ class Grab:
             if text == map:
                 return map
         return "None"
+
+    def grabTimer(self, frame) -> int:
+        feed_roi = frame[445:725, 550:1400]
+
+        timer_roi = cv2.threshold(np.array(feed_roi), 125, 255, cv2.THRESH_BINARY)[1]
+
+        text = pytesseract.image_to_string(thresh, lang="eng", config="--psm 7 --oem 1")
+        text = text.split(':')[0]
+
+        return 60 * 60 * (int(text)+1)
 
     def grabFeed(self, frame, map, id, fts) -> dict:
         #720 roi

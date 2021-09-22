@@ -1,7 +1,7 @@
 from PIL import Image
 import pytesseract
 import argparse
-import numpy
+import numpy as np
 import cv2
 import os
 
@@ -53,16 +53,30 @@ if args["detection"] == "feed":
     feed_roi = cv2.resize(feed_roi, (width, height), interpolation = cv2.INTER_AREA)
 
     filename = f"{os.getpid()}.png"
-    cv2.imwrite(filename, feed_roaptivecv2._THREi   )
-np. thersh   cv2.imshow("Output", feed_roi)
+    cv2.imwrite(filename, feed_roi)
+    cv2.imshow("Output", feed_roi)
+
+if args["detection"] == "timer":
+    feed_roi = image[445:725, 550:1400]
+
+    feed_roi = cv2.threshold(np.array(feed_roi), 125, 255, cv2.THRESH_BINARY)[1]
+
+    filename = f"{os.getpid()}.png"
+    cv2.imwrite(filename, feed_roi)
+    cv2.imshow("Output", feed_roi)
 
 text = pytesseract.image_to_string(Image.open(filename), lang="eng", config="--psm 6 --oem 1")
 os.remove(filename)
 print(text)
 
-# cv2.imshow("Image", image)
-# cv2.imshow("Output", gray)
 cv2.waitKey(0)
+
+if args["detection"] == "timer":
+    # skip an extra minute ahead
+    text = text.split(":")[0]
+    frames = 60**2 * (int(text)+1)
+
+    print(f"skipping {frames} frames")
 
 if args["detection"] == "map":
     text = text.split("-")[0]
