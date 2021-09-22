@@ -4,7 +4,13 @@ from numpy.linalg import norm
 import cv2
 
 class Grab:
-    def __init__(self, bounds):
+    def __init__(self, bounds=[{'bounds': [np.array([57,  91, 255], dtype=np.uint8), np.array([56,  90, 255], dtype=np.uint8)], 'color_space': 'BGR'}, {'bounds': [np.array([255, 255, 255], dtype=np.uint8), np.array([255, 255, 255], dtype=np.uint8)], 'color_space': 'HLS'}]):
+        self.bounds = bounds
+
+    def getBounds(self):
+        return self.bounds
+
+    def setBounds(self, bounds):
         self.bounds = bounds
 
     def isClip(self, players) -> list:
@@ -24,28 +30,26 @@ class Grab:
     def secondOfFrame(self, frame) -> int:
         return frame // 60
 
-    def grabTeamColors(self, frame) -> list:
-        bounds = 
-        colors = []
-
-        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        # find rois
-        team1_color = frame[:, :]
-        team2_color = frame[:, :]
-
-        b, g, r = team1_color
-
-        # figure out how to
-
-
-        colors.append(np.array(b, g, r))
-
-        b, g, r = team2_color
-        colors.append(np.array(b, g, r))
-
-        return colors
-
-
+    # def grabTeamColors(self, frame) -> list:
+    #     colors = []
+    #
+    #     team1_roi = frame[25:60, 300:350]
+    #     team1 = [np.array(team1_roi[0, 0]), np.array(team1_roi[34, 49])]
+    #
+    #     if (team1[0][0] >= 255-55) and (team1[0][1] >= 255-55) and (team1[0][2] >= 255-55):
+    #         colors.append({"bounds": team1, "color_space": "HLS"})
+    #     else:
+    #         colors.append({"bounds": team1, "color_space": "BGR"})
+    #
+    #     team2_roi = image[25:60, 1550:1600]
+    #     team2 = [np.array(team2_roi[0, 0]), np.array(team2_roi[34, 49])]
+    #
+    #     if (team2[0][0] >= 255-55) and (team2[0][1] >= 255-55) and (team2[0][2] >= 255-55):
+    #         colors.append({"bounds": team2, "color_space": "HLS"})
+    #     else:
+    #         colors.append({"bounds": team2, "color_space": "BGR"})
+    #
+    #     return colors
 
     def grabTeams(self, title) -> list:
     # "Champs Final | @Toronto Ultra vs @Atlanta FaZe | Championship Weekend | Day 4"

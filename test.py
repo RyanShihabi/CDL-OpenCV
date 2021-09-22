@@ -85,6 +85,7 @@ if args["detection"] == "color":
         colors.append({"bounds": team2, "color_space": "BGR"})
 
     print(colors)
+    print(colors[0]["bounds"][0])
 
     cv2.imshow("team1", team1_roi)
 

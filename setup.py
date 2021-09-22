@@ -7,8 +7,29 @@ import numpy as np
 import grab
 import cv2
 
-teams = {"Toronto Ultra": {"bounds": [np.array([0, 175, 0]), np.array([255, 255, 255])], "color_space": "HLS"},
-        "Atlanta FaZe": {"bounds": [np.array([65, 72, 110]), np.array([119, 133, 206])], "color_space": "BGR"}}
+def grabTeamColors(frame) -> list:
+    colors = []
+
+    team1_roi = frame[25:60, 300:350]
+    team1 = [team1_roi[0, 0], team1_roi[34, 49]]
+
+    if (team1[0][0] >= 255-55) and (team1[0][1] >= 255-55) and (team1[0][2] >= 255-55):
+        colors.append({"bounds": team1, "color_space": "HLS"})
+    else:
+        colors.append({"bounds": team1, "color_space": "BGR"})
+
+    team2_roi = image[25:60, 1550:1600]
+    team2 = [team2_roi[0, 0], team2_roi[34, 49]]
+
+    if (team2[0][0] >= 255-55) and (team2[0][1] >= 255-55) and (team2[0][2] >= 255-55):
+        colors.append({"bounds": team2, "color_space": "HLS"})
+    else:
+        colors.append({"bounds": team2, "color_space": "BGR"})
+
+    return colors
+
+
+teams = []
         # "Dallas Empire": {"bounds": [], "color_space": "BGR"},
         # "Florida Mutineers": {"bounds": [], "color_space": "BGR"},
         # "London Royal Ravens": {"bounds": [], "color_space": "BGR"},
@@ -72,7 +93,7 @@ def main():
             completed_videos.append(line)
     f.close()
 
-    maps = ""
+    maps = []
     clips = {"clips": []}
     for video in videos:
         if video[0] not in completed_videos:
@@ -96,7 +117,7 @@ def main():
 
                     if map != "None":
                         maps.append(map)
-                        map_current = map
+                        print(map_current)
 
                     try:
                         clip = grab.grabFeed(frame, maps[-1], video[1])
