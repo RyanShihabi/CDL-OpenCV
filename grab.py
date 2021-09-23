@@ -121,7 +121,7 @@ class Grab:
             hls = cv2.cvtColor(feed_roi, cv2.COLOR_BGR2HLS)
             light = hls[:, :, 1]
 
-            mask_team1 = cv2.inRange(hls, team2_lower, team2_upper)
+            mask_team1 = cv2.inRange(light, 200, 255)
 
             res = cv2.bitwise_or(feed_roi, feed_roi, mask=mask_team1)
 
@@ -148,7 +148,7 @@ class Grab:
         if self.bounds[1]["color_space"] == "BGR":
             mask_team2 = cv2.inRange(feed_roi, team2_lower, team2_upper)
 
-            res = cv2.bitwise_and(feed_roi, feed_roi, mask=mask_team2)
+            res = cv2.bitwise_or(feed_roi, feed_roi, mask=mask_team2)
 
             gray = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
 
@@ -164,7 +164,10 @@ class Grab:
             hls = cv2.cvtColor(feed_roi, cv2.COLOR_BGR2HLS)
             light = hls[:, :, 1]
 
-            mask_team2 = cv2.inRange(hls, team2_lower, team2_upper)
+            # bgr_lower = self.bounds[1]["bounds"][0]
+            # bgr_upper = self.bounds[1]["bounds"][1]
+
+            mask_team2 = cv2.inRange(light, 220, 255)
 
             res = cv2.bitwise_or(feed_roi, feed_roi, mask=mask_team2)
 
