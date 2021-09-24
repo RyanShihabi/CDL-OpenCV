@@ -92,6 +92,11 @@ class Grab:
         # feed_roi = frame[350:500, 0:275]
         text = []
 
+        # create a mask for all team colors
+            # see which masks produce the most text
+            # terminate the masks that give no information
+                # or just let them all run
+
         #1080 roi
         feed_roi = frame[500:700, 0:175]
 
@@ -111,6 +116,8 @@ class Grab:
             gray = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
 
             blur = cv2.medianBlur(gray, 1)
+
+
 
             #OTSU
             # thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
