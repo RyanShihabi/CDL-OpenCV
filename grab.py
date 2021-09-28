@@ -31,27 +31,6 @@ class Grab:
     def secondOfFrame(self, frame) -> int:
         return frame // 60
 
-    # def grabTeamColors(self, frame) -> list:
-    #     colors = []
-    #
-    #     team1_roi = frame[25:60, 300:350]
-    #     team1 = [np.array(team1_roi[0, 0]), np.array(team1_roi[34, 49])]
-    #
-    #     if (team1[0][0] >= 255-55) and (team1[0][1] >= 255-55) and (team1[0][2] >= 255-55):
-    #         colors.append({"bounds": team1, "color_space": "HLS"})
-    #     else:
-    #         colors.append({"bounds": team1, "color_space": "BGR"})
-    #
-    #     team2_roi = image[25:60, 1550:1600]
-    #     team2 = [np.array(team2_roi[0, 0]), np.array(team2_roi[34, 49])]
-    #
-    #     if (team2[0][0] >= 255-55) and (team2[0][1] >= 255-55) and (team2[0][2] >= 255-55):
-    #         colors.append({"bounds": team2, "color_space": "HLS"})
-    #     else:
-    #         colors.append({"bounds": team2, "color_space": "BGR"})
-    #
-    #     return colors
-
     def grabTeams(self, title) -> list:
     # "Champs Final | @Toronto Ultra vs @Atlanta FaZe | Championship Weekend | Day 4"
         teams = title.split("|")[1].split("@")[1:]
@@ -116,8 +95,6 @@ class Grab:
             gray = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
 
             blur = cv2.medianBlur(gray, 1)
-
-
 
             #OTSU
             # thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]

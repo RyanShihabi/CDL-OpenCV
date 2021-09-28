@@ -9,22 +9,46 @@ import cv2
 
 def grabTeamColors(frame) -> list:
     colors = []
+    dim_threshold = 2.25
+    bright_threshold = 2.65
 
     team1_roi = frame[25:60, 300:350]
-    team1 = [team1_roi[0, 0], team1_roi[34, 49]]
+    team2_roi = frame[25:60, 1550:1600]
 
-    if (team1[0][0] >= 255-55) and (team1[0][1] >= 255-55) and (team1[0][2] >= 255-55):
-        colors.append({"bounds": team1, "color_space": "HLS"})
+    team1_color_b, team1_color_g, team1_color_r = team1_roi[16, 24]
+    team2_color_b, team2_color_g, team2_color_r = team2_roi[16, 24]
+
+    if (team1_color_b >= 255-55) and (team1_color_g >= 255-55) and (team1_color_r >= 255-55):
+        team1_bounds = [np.array([np.maximum(0, team1_color_b-50), np.maximum(0, team1_color_g-50), np.maximum(0, team1_color_r-50)]), np.array([np.minimum(255, team1_color_b+50), np.minimum(255, team1_color_g+50), np.minimum(255, team1_color_r+50)])]
+        colors.append({"bounds": team1_bounds, "color_space": "HLS"})
     else:
-        colors.append({"bounds": team1, "color_space": "BGR"})
+        team1_color_b_min = np.maximum(0, int(team1_color_b / dim_threshold))
+        team1_color_g_min = np.maximum(0, int(team1_color_g / dim_threshold))
+        team1_color_r_min = np.maximum(0, int(team1_color_r / dim_threshold))
 
-    team2_roi = image[25:60, 1550:1600]
-    team2 = [team2_roi[0, 0], team2_roi[34, 49]]
+        team1_color_b_max = np.minimum(255, int(team1_color_b * bright_threshold))
+        team1_color_g_max = np.minimum(255, int(team1_color_g * bright_threshold))
+        team1_color_r_max = np.minimum(255, int(team1_color_r * bright_threshold))
 
-    if (team2[0][0] >= 255-55) and (team2[0][1] >= 255-55) and (team2[0][2] >= 255-55):
-        colors.append({"bounds": team2, "color_space": "HLS"})
+        team1_bounds = [np.array([team1_color_b_min, team1_color_g_min, team1_color_r_min]), np.array([team1_color_b_max, team1_color_g_max, team1_color_r_max])]
+        print(team1_bounds)
+        colors.append({"bounds": team1_bounds, "color_space": "BGR"})
+
+    if (team2_color_b >= 255-55) and (team2_color_g >= 255-55) and (team2_color_r >= 255-55):
+        team2_bounds = [np.array([np.maximum(0, team2_color_b-50), np.maximum(0, team2_color_g-50), np.maximum(0, team2_color_r-50)]), np.array([np.minimum(255, team2_color_b+50), np.minimum(255, team2_color_g+50), np.minimum(255, team2_color_r+50)])]
+        colors.append({"bounds": team2_bounds, "color_space": "HLS"})
     else:
-        colors.append({"bounds": team2, "color_space": "BGR"})
+        team2_color_b_min = np.maximum(0, int(team2_color_b / dim_threshold))
+        team2_color_g_min = np.maximum(0, int(team2_color_g / dim_threshold))
+        team2_color_r_min = np.maximum(0, int(team2_color_r / dim_threshold))
+
+        team2_color_b_max = np.minimum(255, int(team2_color_b * bright_threshold))
+        team2_color_g_max = np.minimum(255, int(team2_color_g * bright_threshold))
+        team2_color_r_max = np.minimum(255, int(team2_color_r * bright_threshold))
+
+        team2_bounds = [np.array([team2_color_b_min, team2_color_g_min, team2_color_r_min]), np.array([team2_color_b_max, team2_color_g_max, team2_color_r_max])]
+        print(team2_bounds)
+        colors.append({"bounds": team2_bounds, "color_space": "BGR"})
 
     return colors
 
@@ -44,10 +68,10 @@ teams = []
 teamHSV = {"Toronto Ultra": [np.array([0, 0, 177], np.uint8), np.array([179, 55, 255], np.uint8)],
             "Atlanta FaZe": [np.array([0, 68, 120], np.uint8), np.array([179, 205, 255], np.uint8)]}
 
-def grabTeamHSV(title):
+def grabTeams(self, title) -> list:
 # "Champs Final | @Toronto Ultra vs @Atlanta FaZe | Championship Weekend | Day 4"
     teams = title.split("|")[1].split("@")[1:]
-    return [teamHSV[teams[0][:-4]], teamHSV[teams[1][:-1]]]
+    return [teams[0][:-4], teams[1][:-1]]
 
 def main():
     playlist = "PLisfUdjySbZVoTRbAlfObs8dI-cb-gWk-"
@@ -95,6 +119,7 @@ def main():
 
     maps = []
     clips = {"clips": []}
+    grab = Grab()
     for video in videos:
         if video[0] not in completed_videos:
             hsv_values = grabTeamHSV(video[0])
@@ -110,26 +135,36 @@ def main():
             frame_count = 0
                 while cap.isOpened():
                     ret, frame = cap.read()
-                    cv2.imshow("FaZeTorontoRaid", frame)
 
-                    # find a way to not ping the map continuously, do once finished with entire program
-                    map = grab.grabMap(frame)
+                    if (frame_count % 30 == 0) and (len(colors) > 0) and (len(maps) == rounds):
+                        try:
+                            clip = grab.grabFeed(frame, maps[-1], "TestVideo", frame_count)
+                            if clip != None:
+                                print("clip found")
+                                clips["clips"].append(clip)
+                                cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + 300)
+                                frame_count += 300
+                                # skip five seconds worth of frames as clips range 5 seconds back and forward
+                                # 5 seconds in terms of 60 frames per second
+                        except Exception as e:
+                            print(e)
+                    else:
+                        if frame_count % 30 == 0:
+                            map = grab.grabMapName(frame)
 
-                    if map != "None":
-                        maps.append(map)
-                        print(map_current)
+                            if map != "None":
+                                print("Map detected:", map)
+                                maps.append(map)
+                                cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + map_skip)
+                                frame_count += map_skip
+                                continue
 
-                    try:
-                        clip = grab.grabFeed(frame, maps[-1], video[1])
-                        # clip = grab.grabFeed(frame, map_current, video[1])
+                            if len(maps) == rounds:
+                                colors = grabTeamColors(frame)
+                                print(colors)
+                                grab.setBounds(colors)
 
-                        if clip != None:
-                            clips["clips"].append(clip)
-                            cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count += 300)
-                            # skip five seconds worth of frames as clips range 5 seconds back and forward
-                    except IndexError:
-                        print("No map detected, can't detect feed")
-
+                    cv2.imshow("Frame", frame)
                     frame_count += 1
 
 
