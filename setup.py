@@ -7,9 +7,12 @@ import numpy as np
 import grab
 import cv2
 
+# start downloading videos
+#
+
 def grabTeamColors(frame) -> list:
     colors = []
-    dim_threshold = 2.25
+    dim_threshold = 2.3
     bright_threshold = 2.65
 
     team1_roi = frame[25:60, 300:350]

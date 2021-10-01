@@ -191,6 +191,7 @@ class Grab:
 
         if player != None:
             second = self.secondOfFrame(fts)
+            # keep clan name?
             return {"player": player, "clip_range": f"https://www.youtube.com/watch?start={second-5}&end={second+5}&v={id}&ab_channel=CallofDutyLeague", "map": map}
             # Dont need to check if second is less than 5, wont happen games dont start until later
 
