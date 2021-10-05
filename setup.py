@@ -133,6 +133,9 @@ def main():
             if path.isfile(f"{video[0]}.mp4") == False;
                 os.system(f"youtube-dl -f 299 {video[1]}")
 
+            # Implement time extraction
+            # Make sure the download is cancelled if not completed
+
 
             cap = cv2.VideoCapture(f"videos/{video[0]}.mp4")
             frame_count = 0

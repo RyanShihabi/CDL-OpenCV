@@ -1,37 +1,27 @@
-import cv2
-import os
-import argparse
+from imutils.video import FileVideoStream
 from imutils.video import FPS
-from grab import *
+import numpy as np
+import argparse
+import imutils
+import time
+import cv2
 
-ap = ArgumentParser()
-ap.add_argument("-v", "--video", required=True, help="input VOD for clip detection")
-ap.add_argument("-l", "--link", required=True, help="input youtube URL")
-args = vars(ap.parse_args())
+# try reading the entire screen
 
-video = cv2.VideoCapture(args["video"])
+cap = cv2.VideoCapture("videos/FazeTorontoRaid.mp4")
+
+fvs = FileVideoStream("videos/FazeTorontoRaid.mp4").start()
+time.sleep(1.0)
+# start the FPS timer
 fps = FPS().start()
 
-while video.isOpened():
-    ret, frame = video.read()
-    cv2.imshow('VOD', frame)
+while cap.isOpened():
+# while fvs.more():
+    # frame = fvs.read()
+    ret, frame = cap.read()
 
-    # print(frame)
-    map = grabMap(frame)
+    cv2.imshow("Frame", frame)
+    cv2.waitKey(1)
 
-    #figure out a way to store the map for the time being
-        # map should be different from the one before it
-        # Add a check map loop
-        # once video is over, clear map history
-
-    if map != "":
-        grabFeed(frame, int(fps.elapsed()))
-
-    fps.update()
-
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-
-fps.stop()
-video.release()
 cv2.destroyAllWindows()
+fvs.stop()

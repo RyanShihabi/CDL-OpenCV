@@ -93,11 +93,35 @@ if args["detection"] == "color":
 
     cv2.waitKey(0)
 
+if args["detection"] == "game":
+    roi = image[150:200, 900:1050]
+    width = int(roi.shape[1] * 250 / 100)
+    height = int(roi.shape[0] * 250 / 100)
+
+    roi = cv2.resize(roi, (width, height), interpolation = cv2.INTER_AREA)
+    roi = cv2.medianBlur(roi, 3)
+
+    roi = cv2.threshold(np.array(roi), 125, 255, cv2.THRESH_BINARY)[1]
+    filename = f"{os.getpid()}.png"
+
+    cv2.imwrite(filename, roi)
+    cv2.imshow("game", roi)
+
 text = pytesseract.image_to_string(Image.open(filename), lang="eng", config="--psm 6 --oem 1")
 os.remove(filename)
 print(text)
 
 cv2.waitKey(0)
+
+if args["detection"] == "game":
+    modes = ["CONTROL", "HARDPOINT", "SEARCH & DESTROY"]
+
+    text = text.split("\n")[0]
+
+    if text in modes:
+        print("In Game")
+    else:
+        print("Not in game")
 
 if args["detection"] == "timer":
     # skip an extra minute ahead

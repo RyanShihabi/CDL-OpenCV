@@ -1,6 +1,6 @@
 import pytesseract
 import numpy as np
-from numpy.linalg import norm
+import imutils
 import cv2
 
 class Grab:
@@ -36,6 +36,11 @@ class Grab:
         teams = title.split("|")[1].split("@")[1:]
         return [teams[0][:-4], teams[1][:-1]]
 
+    def inGame(self, frame) -> bool:
+        roi = frame[:, :]
+
+
+
     def grabMapName(self, frame) -> str:
         maps = ["RAID", "GARRISON"]
 
@@ -47,9 +52,18 @@ class Grab:
         #1080
         mapName = gray[875:975, 345:900]
 
+        # cv2.imshow("Map", mapName)
+
         text = pytesseract.image_to_string(mapName, lang="eng", config="--psm 6 --oem 1")
 
+
         text = text.split(" ")[0]
+
+        # full_text = pytesseract.image_to_string(frame, lang="eng", config="--psm 6 --oem 1")
+        #
+        # text = text.split(" ")[0]
+
+        print(text)
 
         for map in maps:
             if text == map:
@@ -66,15 +80,10 @@ class Grab:
 
         return 60 * 60 * (int(text)+1)
 
-    def grabFeed(self, frame, map, id, fts) -> dict:
+    def grabFeed(self, frame, id, fts) -> dict:
         #720 roi
         # feed_roi = frame[350:500, 0:275]
         text = []
-
-        # create a mask for all team colors
-            # see which masks produce the most text
-            # terminate the masks that give no information
-                # or just let them all run
 
         #1080 roi
         feed_roi = frame[500:700, 0:175]
@@ -119,7 +128,7 @@ class Grab:
         #OTSU
         # thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
         # print(thresh)
-        cv2.imshow("Team 1", thresh)
+        # cv2.imshow("Team 1", thresh)
 
         team1_text = pytesseract.image_to_string(thresh, lang="eng", config="--psm 6 --oem 1")
         team1_text = team1_text.split('\n')[:-1]
@@ -161,7 +170,7 @@ class Grab:
         else:
             print("no color space format detected")
 
-        cv2.imshow("Team 2", thresh)
+        # cv2.imshow("Team 2", thresh)
 
         # kernel = np.ones((3,3), np.uint8)
         # erosion = cv2.erode(thresh, kernel, iterations=1)
@@ -192,7 +201,7 @@ class Grab:
         if player != None:
             second = self.secondOfFrame(fts)
             # keep clan name?
-            return {"player": player, "clip_range": f"https://www.youtube.com/watch?start={second-5}&end={second+5}&v={id}&ab_channel=CallofDutyLeague", "map": map}
+            return {"player": player, "clip_range": f"https://www.youtube.com/watch?start={second-5}&end={second+5}&v={id}&ab_channel=CallofDutyLeague"}
             # Dont need to check if second is less than 5, wont happen games dont start until later
 
         return None
