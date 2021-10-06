@@ -94,6 +94,7 @@ if args["detection"] == "color":
     cv2.waitKey(0)
 
 if args["detection"] == "game":
+    # there may be a better roi
     roi = image[150:200, 900:1050]
     width = int(roi.shape[1] * 250 / 100)
     height = int(roi.shape[0] * 250 / 100)
@@ -114,7 +115,7 @@ print(text)
 cv2.waitKey(0)
 
 if args["detection"] == "game":
-    modes = ["CONTROL", "HARDPOINT", "SEARCH & DESTROY"]
+    modes = ["CONTROL", "HARDPOINT", "SEARCH & DESTROY", "SND"] #find other game modes, test mutltiple roi
 
     text = text.split("\n")[0]
 

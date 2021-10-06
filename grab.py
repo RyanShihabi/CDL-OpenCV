@@ -37,8 +37,25 @@ class Grab:
         return [teams[0][:-4], teams[1][:-1]]
 
     def inGame(self, frame) -> bool:
-        roi = frame[:, :]
+        modes = ["CONTROL", "HARDPOINT", "SEARCH & DESTROY", "SND"] #find other game modes, test mutltiple roi
 
+        roi = frame[150:200, 900:1050]
+        width = int(roi.shape[1] * 250 / 100)
+        height = int(roi.shape[0] * 250 / 100)
+
+        roi = cv2.resize(roi, (width, height), interpolation = cv2.INTER_AREA)
+        roi = cv2.medianBlur(roi, 3)
+
+        roi = cv2.threshold(np.array(roi), 125, 255, cv2.THRESH_BINARY)[1]
+
+        text = pytesseract.image_to_string(roi, lang="eng", config="--psm 6 --oem 1")
+
+        text = text.split("\n")[0]
+
+        if text in modes:
+            return True
+
+        return False
 
 
     def grabMapName(self, frame) -> str:
@@ -71,11 +88,11 @@ class Grab:
         return "None"
 
     def grabTimer(self, frame) -> int:
-        feed_roi = frame[445:725, 550:1400]
+        roi = frame[445:725, 550:1400]
 
-        timer_roi = cv2.threshold(np.array(feed_roi), 125, 255, cv2.THRESH_BINARY)[1]
+        timer_roi = cv2.threshold(np.array(roi), 125, 255, cv2.THRESH_BINARY)[1]
 
-        text = pytesseract.image_to_string(thresh, lang="eng", config="--psm 7 --oem 1")
+        text = pytesseract.image_to_string(timer_roi, lang="eng", config="--psm 7 --oem 1")
         text = text.split(':')[0]
 
         return 60 * 60 * (int(text)+1)
@@ -128,7 +145,7 @@ class Grab:
         #OTSU
         # thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
         # print(thresh)
-        # cv2.imshow("Team 1", thresh)
+        cv2.imshow("Team 1", thresh)
 
         team1_text = pytesseract.image_to_string(thresh, lang="eng", config="--psm 6 --oem 1")
         team1_text = team1_text.split('\n')[:-1]
@@ -170,7 +187,7 @@ class Grab:
         else:
             print("no color space format detected")
 
-        # cv2.imshow("Team 2", thresh)
+        cv2.imshow("Team 2", thresh)
 
         # kernel = np.ones((3,3), np.uint8)
         # erosion = cv2.erode(thresh, kernel, iterations=1)
