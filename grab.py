@@ -37,24 +37,29 @@ class Grab:
         return [teams[0][:-4], teams[1][:-1]]
 
     def inGame(self, frame) -> bool:
-        modes = ["CONTROL", "HARDPOINT", "SEARCH & DESTROY", "SND"] #find other game modes, test mutltiple roi
+        # modes = ["CONTROL", "HARDPOINT", "SEARCH & DESTROY", "SND"] #find other game modes, test mutltiple roi
 
-        roi = frame[150:200, 900:1050]
-        width = int(roi.shape[1] * 250 / 100)
-        height = int(roi.shape[0] * 250 / 100)
+        # roi = frame[150:200, 900:1050]
+        # width = int(roi.shape[1] * 250 / 100)
+        # height = int(roi.shape[0] * 250 / 100)
+        #
+        # roi = cv2.resize(roi, (width, height), interpolation = cv2.INTER_AREA)
+        # roi = cv2.medianBlur(roi, 3)
+        #
+        # roi = cv2.threshold(np.array(roi), 125, 255, cv2.THRESH_BINARY)[1]
+        #
+        # cv2.imshow("mode", roi)
+        #
+        # text = pytesseract.image_to_string(roi, lang="eng", config="--psm 6 --oem 1")
+        #
+        # text = text.split("\n")[0]
 
-        roi = cv2.resize(roi, (width, height), interpolation = cv2.INTER_AREA)
-        roi = cv2.medianBlur(roi, 3)
+        roi = frame[85:100, 950:975]
+        b, g, r = roi[10, 10]
+        print([b, g, r])
 
-        roi = cv2.threshold(np.array(roi), 125, 255, cv2.THRESH_BINARY)[1]
-
-        text = pytesseract.image_to_string(roi, lang="eng", config="--psm 6 --oem 1")
-
-        text = text.split("\n")[0]
-
-        if text in modes:
+        if (60 <= b <= 68) and (52 <= g <= 60) and (50 <= r <= 58):
             return True
-
         return False
 
 

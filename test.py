@@ -95,14 +95,16 @@ if args["detection"] == "color":
 
 if args["detection"] == "game":
     # there may be a better roi
-    roi = image[150:200, 900:1050]
-    width = int(roi.shape[1] * 250 / 100)
-    height = int(roi.shape[0] * 250 / 100)
-
-    roi = cv2.resize(roi, (width, height), interpolation = cv2.INTER_AREA)
-    roi = cv2.medianBlur(roi, 3)
-
-    roi = cv2.threshold(np.array(roi), 125, 255, cv2.THRESH_BINARY)[1]
+    roi = image[85:100, 950:975]
+    b, g, r = roi[10, 10]
+    print([b, g, r])
+    # width = int(roi.shape[1] * 250 / 100)
+    # height = int(roi.shape[0] * 250 / 100)
+    #
+    # roi = cv2.resize(roi, (width, height), interpolation = cv2.INTER_AREA)
+    # # roi = cv2.medianBlur(roi, 3)
+    #
+    # # roi = cv2.threshold(np.array(roi), 125, 255, cv2.THRESH_BINARY)[1]
     filename = f"{os.getpid()}.png"
 
     cv2.imwrite(filename, roi)
@@ -115,14 +117,19 @@ print(text)
 cv2.waitKey(0)
 
 if args["detection"] == "game":
-    modes = ["CONTROL", "HARDPOINT", "SEARCH & DESTROY", "SND"] #find other game modes, test mutltiple roi
+    # modes = ["CONTROL", "HARDPOINT", "SEARCH & DESTROY", "SND"] #find other game modes, test mutltiple roi
 
-    text = text.split("\n")[0]
+    # text = text.split("\n")[0]
 
-    if text in modes:
+    if b == 64 and g == 56 and r == 54:
         print("In Game")
     else:
         print("Not in game")
+
+    # if text in modes:
+    #     print("In Game")
+    # else:
+    #     print("Not in game")
 
 if args["detection"] == "timer":
     # skip an extra minute ahead
