@@ -4,7 +4,7 @@ import imutils
 import cv2
 
 class Grab:
-    def __init__(self, bounds=[{'bounds': [np.array([57,  91, 255], dtype=np.uint8), np.array([56,  90, 255], dtype=np.uint8)], 'color_space': 'BGR'}, {'bounds': [np.array([255, 255, 255], dtype=np.uint8), np.array([255, 255, 255], dtype=np.uint8)], 'color_space': 'HLS'}]):
+    def __init__(self, bounds=[{'bounds': [np.array([56,  90, 255], dtype=np.uint8), np.array([57,  91, 255], dtype=np.uint8)], 'color_space': 'BGR'}, {'bounds': [np.array([255, 255, 255], dtype=np.uint8), np.array([255, 255, 255], dtype=np.uint8)], 'color_space': 'HLS'}]):
         self.bounds = bounds
 
     def getBounds(self):
@@ -115,84 +115,89 @@ class Grab:
 
         feed_roi = cv2.resize(feed_roi, (width, height), interpolation = cv2.INTER_AREA)
 
-        team1_lower = self.bounds[0]["bounds"][0]
-        team1_upper = self.bounds[0]["bounds"][1]
-
-        if self.bounds[0]["color_space"] == "BGR":
-            mask_team1 = cv2.inRange(feed_roi, team1_lower, team1_upper)
-
-            res = cv2.bitwise_or(feed_roi, feed_roi, mask=mask_team1)
-
-            gray = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
-
-            blur = cv2.medianBlur(gray, 1)
-
-            #OTSU
-            # thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
-
-            thresh = cv2.adaptiveThreshold(blur, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 71, 1)
-
-        elif self.bounds[0]["color_space"] == "HLS":
-            hls = cv2.cvtColor(feed_roi, cv2.COLOR_BGR2HLS)
-            light = hls[:, :, 1]
-
-            mask_team1 = cv2.inRange(light, 200, 255)
-
-            res = cv2.bitwise_or(feed_roi, feed_roi, mask=mask_team1)
-
-            gray = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
-
-            thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 71, 1)
-
-        else:
-            print("no color space format detected")
-
-        #OTSU
-        # thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
-        # print(thresh)
-        cv2.imshow("Team 1", thresh)
-
-        team1_text = pytesseract.image_to_string(thresh, lang="eng", config="--psm 6 --oem 1")
-        team1_text = team1_text.split('\n')[:-1]
-
-        text.append(team1_text)
-
-        team2_lower = self.bounds[1]["bounds"][0]
-        team2_upper = self.bounds[1]["bounds"][1]
-
-        if self.bounds[1]["color_space"] == "BGR":
-            mask_team2 = cv2.inRange(feed_roi, team2_lower, team2_upper)
-
-            res = cv2.bitwise_or(feed_roi, feed_roi, mask=mask_team2)
-
-            gray = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
-
-            blur = cv2.medianBlur(gray, 1)
-
-            #OTSU
-            # thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
-
-            thresh = cv2.adaptiveThreshold(blur, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 71, 1)
+        text = pytesseract.image_to_string(feed_roi, lang="eng", config="--psm 6 --oem 1")
+        text = text.split('\n')[:-1]
 
 
-        elif self.bounds[1]["color_space"] == "HLS":
-            hls = cv2.cvtColor(feed_roi, cv2.COLOR_BGR2HLS)
-            light = hls[:, :, 1]
 
-            # bgr_lower = self.bounds[1]["bounds"][0]
-            # bgr_upper = self.bounds[1]["bounds"][1]
+        # team1_lower = self.bounds[0]["bounds"][0]
+        # team1_upper = self.bounds[0]["bounds"][1]
+        #
+        # if self.bounds[0]["color_space"] == "BGR":
+        #     mask_team1 = cv2.inRange(feed_roi, team1_lower, team1_upper)
+        #
+        #     res = cv2.bitwise_or(feed_roi, feed_roi, mask=mask_team1)
+        #
+        #     gray = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
+        #
+        #     blur = cv2.medianBlur(gray, 1)
+        #
+        #     #OTSU
+        #     # thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
+        #
+        #     thresh = cv2.adaptiveThreshold(blur, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 71, 1)
+        #
+        # elif self.bounds[0]["color_space"] == "HLS":
+        #     hls = cv2.cvtColor(feed_roi, cv2.COLOR_BGR2HLS)
+        #     light = hls[:, :, 1]
+        #
+        #     mask_team1 = cv2.inRange(light, 200, 255)
+        #
+        #     res = cv2.bitwise_or(feed_roi, feed_roi, mask=mask_team1)
+        #
+        #     gray = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
+        #
+        #     thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 71, 1)
+        #
+        # else:
+        #     print("no color space format detected")
+        #
+        # #OTSU
+        # # thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
+        # # print(thresh)
+        # cv2.imshow("Team 1", feed_roi)
+        #
+        # team1_text = pytesseract.image_to_string(feed_roi, lang="eng", config="--psm 6 --oem 1")
+        # team1_text = team1_text.split('\n')[:-1]
+        #
+        # text.append(team1_text)
+        #
+        # team2_lower = self.bounds[1]["bounds"][0]
+        # team2_upper = self.bounds[1]["bounds"][1]
+        #
+        # if self.bounds[1]["color_space"] == "BGR":
+        #     mask_team2 = cv2.inRange(feed_roi, team2_lower, team2_upper)
+        #
+        #     res = cv2.bitwise_or(feed_roi, feed_roi, mask=mask_team2)
+        #
+        #     gray = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
+        #
+        #     blur = cv2.medianBlur(gray, 1)
+        #
+        #     #OTSU
+        #     # thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
+        #
+        #     thresh = cv2.adaptiveThreshold(blur, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 71, 1)
+        #
+        #
+        # elif self.bounds[1]["color_space"] == "HLS":
+        #     hls = cv2.cvtColor(feed_roi, cv2.COLOR_BGR2HLS)
+        #     light = hls[:, :, 1]
+        #
+        #     # bgr_lower = self.bounds[1]["bounds"][0]
+        #     # bgr_upper = self.bounds[1]["bounds"][1]
+        #
+        #     mask_team2 = cv2.inRange(light, 220, 255)
+        #
+        #     res = cv2.bitwise_or(feed_roi, feed_roi, mask=mask_team2)
+        #
+        #     gray = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
+        #
+        #     thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 71, 1)
+        # else:
+        #     print("no color space format detected")
 
-            mask_team2 = cv2.inRange(light, 220, 255)
-
-            res = cv2.bitwise_or(feed_roi, feed_roi, mask=mask_team2)
-
-            gray = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
-
-            thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 71, 1)
-        else:
-            print("no color space format detected")
-
-        cv2.imshow("Team 2", thresh)
+        # cv2.imshow("Team 2", thresh)
 
         # kernel = np.ones((3,3), np.uint8)
         # erosion = cv2.erode(thresh, kernel, iterations=1)
@@ -201,23 +206,21 @@ class Grab:
 
         # cv2.imshow("feed", erosion)
 
-        team2_text = pytesseract.image_to_string(thresh, lang="eng", config="--psm 6 --oem 1")
-        team2_text = team2_text.split('\n')[:-1]
-
-        text.append(team2_text)
-
-        print(text)
+        # team2_text = pytesseract.image_to_string(feed_roi, lang="eng", config="--psm 6 --oem 1")
+        # team2_text = team2_text.split('\n')[:-1]
+        #
+        # text.append(team2_text)
 
         # players format [['clan tag', 'gamertag'], ...]
         players = []
-        for lines in text:
-            for line in lines:
-                if len(line) > 4:
-                    if line[0] in ['[', '(', '|', '{'] or line[4] in [']', ')', '|', '}']:
-                        # make it so the brackets dont make it into the clan abbreviation
-                        players.append(line.split(" ")[:2])
+        for line in text:
+            # for line in lines:
+            if len(line) > 4:
+                if line[0] in ['[', '(', '|', '{'] or line[4] in [']', ')', '|', '}']:
+                    # make it so the brackets dont make it into the clan abbreviation
+                    players.append(line.split(" ")[:2])
 
-        # print(players)
+        print(players)
         player = self.isClip(players)
 
         if player != None:

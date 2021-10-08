@@ -43,7 +43,7 @@ if args["detection"] == "feed":
     # gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
     # thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
-    feed_roi = image[300:475, 0:275]
+    feed_roi = image[500:700, 0:175]
 
     feed_roi = cv2.medianBlur(feed_roi, 1)
 
