@@ -28,7 +28,7 @@ class Grab:
                 if players[i] == players[j]:
                     return players[i]
                 else:
-                    if players[i][1] == players[j][1]:
+                    if players[i][1].lower() == players[j][1].lower():
                         return players[i]
 
         return None
@@ -65,7 +65,7 @@ class Grab:
         b, g, r = roi[0, 0]
         print([b, g, r])
 
-        if (200 <= b <= 208) and (195 <= g <= 203) and (198 <= r <= 206):
+        if (150 <= b <= 255) and (150 <= g <= 255) and (106 <= r <= 255):
             return True
         return False
 
