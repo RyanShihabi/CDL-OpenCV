@@ -4,11 +4,16 @@ import imutils
 import cv2
 
 class Grab:
-    def __init__(self, bounds=[{'bounds': [np.array([56,  90, 255], dtype=np.uint8), np.array([57,  91, 255], dtype=np.uint8)], 'color_space': 'BGR'}, {'bounds': [np.array([255, 255, 255], dtype=np.uint8), np.array([255, 255, 255], dtype=np.uint8)], 'color_space': 'HLS'}]):
+    def __init__(self, id="", bounds=[{'bounds': [np.array([56,  90, 255], dtype=np.uint8), np.array([57,  91, 255], dtype=np.uint8)], 'color_space': 'BGR'}, {'bounds': [np.array([255, 255, 255], dtype=np.uint8), np.array([255, 255, 255], dtype=np.uint8)], 'color_space': 'HLS'}]):
         self.bounds = bounds
+        self.id = id
 
-    def getBounds(self):
+    def getBounds(self) -> list:
         return self.bounds
+
+    def setId(self, id):
+        print("setting id")
+        self.id = id
 
     def setBounds(self, bounds):
         print("setting bounds")
@@ -54,11 +59,13 @@ class Grab:
         #
         # text = text.split("\n")[0]
 
-        roi = frame[85:100, 950:975]
-        b, g, r = roi[10, 10]
+        # figure out why UI changes background color randomly
+
+        roi = frame[1013:1014, 1455:1456]
+        b, g, r = roi[0, 0]
         print([b, g, r])
 
-        if (60 <= b <= 68) and (52 <= g <= 60) and (50 <= r <= 58):
+        if (200 <= b <= 208) and (195 <= g <= 203) and (198 <= r <= 206):
             return True
         return False
 
@@ -114,6 +121,10 @@ class Grab:
         height = int(feed_roi.shape[0] * 200 / 100)
 
         feed_roi = cv2.resize(feed_roi, (width, height), interpolation = cv2.INTER_AREA)
+
+        feed_roi = cv2.medianBlur(feed_roi, 1)
+
+        cv2.imshow("feed", feed_roi)
 
         text = pytesseract.image_to_string(feed_roi, lang="eng", config="--psm 6 --oem 1")
         text = text.split('\n')[:-1]
@@ -226,7 +237,7 @@ class Grab:
         if player != None:
             second = self.secondOfFrame(fts)
             # keep clan name?
-            return {"player": player, "clip_range": f"https://www.youtube.com/watch?start={second-5}&end={second+5}&v={id}&ab_channel=CallofDutyLeague"}
+            return {"player": player, "clip_range": f"https://www.youtube.com/watch?start={second-5}&end={second+5}&v={self.id}&ab_channel=CallofDutyLeague"}
             # Dont need to check if second is less than 5, wont happen games dont start until later
 
         return None

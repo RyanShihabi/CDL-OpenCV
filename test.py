@@ -95,8 +95,8 @@ if args["detection"] == "color":
 
 if args["detection"] == "game":
     # there may be a better roi
-    roi = image[85:100, 950:975]
-    b, g, r = roi[10, 10]
+    roi = image[1013:1014, 1455:1456]
+    b, g, r = roi[0, 0]
     print([b, g, r])
     # width = int(roi.shape[1] * 250 / 100)
     # height = int(roi.shape[0] * 250 / 100)
@@ -121,7 +121,7 @@ if args["detection"] == "game":
 
     # text = text.split("\n")[0]
 
-    if b == 64 and g == 56 and r == 54:
+    if b == 204 and g == 199 and r == 202:
         print("In Game")
     else:
         print("Not in game")
