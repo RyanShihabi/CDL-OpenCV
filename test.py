@@ -26,6 +26,18 @@ print((image.shape[1], image.shape[0]))
 # test kill feed on multiple scenarios
     # five players on feed
 
+if args["detection"] == "player":
+    player_roi = image[940:990, 1355:1660]
+
+    # width = int(player_roi.shape[1] * 300 / 100)
+    # height = int(player_roi.shape[0] * 300 / 100)
+    #
+    # player_roi = cv2.resize(player_roi, (width, height), interpolation = cv2.INTER_AREA)
+
+    filename = f"{os.getpid()}.png"
+    cv2.imwrite(filename, player_roi)
+    cv2.imshow("Output", player_roi)
+
 if args["detection"] == "map":
     #720p roi
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -115,6 +127,11 @@ os.remove(filename)
 print(text)
 
 cv2.waitKey(0)
+
+if args["detection"] == "player":
+    text = text.split("\n")
+    print(text)
+    print(len(text[0]))
 
 if args["detection"] == "game":
     # modes = ["CONTROL", "HARDPOINT", "SEARCH & DESTROY", "SND"] #find other game modes, test mutltiple roi

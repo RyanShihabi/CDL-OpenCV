@@ -19,6 +19,13 @@ class Grab:
         print("setting bounds")
         self.bounds = bounds
 
+    def grabPlayer(self, frame) -> str:
+        player_roi = frame[940:990, 1355:1660]
+
+        text = pytesseract.image_to_string(player_roi, lang="eng", config="--psm 6 --oem 1").split("\n")[0]
+        print(text)
+        return text
+
     def isClip(self, players) -> list:
         if len(players) < 2:
             return None
@@ -32,6 +39,7 @@ class Grab:
                         return players[i]
 
         return None
+
 
     def secondOfFrame(self, frame) -> int:
         return frame // 60
@@ -83,10 +91,10 @@ class Grab:
 
         # cv2.imshow("Map", mapName)
 
-        text = pytesseract.image_to_string(mapName, lang="eng", config="--psm 6 --oem 1")
+        text = pytesseract.image_to_string(mapName, lang="eng", config="--psm 6 --oem 1").split(" ")[0]
 
 
-        text = text.split(" ")[0]
+        # text = text.split(" ")[0]
 
         # full_text = pytesseract.image_to_string(frame, lang="eng", config="--psm 6 --oem 1")
         #
@@ -104,12 +112,12 @@ class Grab:
 
         timer_roi = cv2.threshold(np.array(roi), 125, 255, cv2.THRESH_BINARY)[1]
 
-        text = pytesseract.image_to_string(timer_roi, lang="eng", config="--psm 7 --oem 1")
-        text = text.split(':')[0]
+        text = pytesseract.image_to_string(timer_roi, lang="eng", config="--psm 7 --oem 1").split(':')[0]
+        # text = text.split(':')[0]
 
         return 60 * 60 * (int(text)+1)
 
-    def grabFeed(self, frame, id, fts) -> dict:
+    def grabFeed(self, frame, fts) -> dict:
         #720 roi
         # feed_roi = frame[350:500, 0:275]
         text = []
@@ -126,8 +134,8 @@ class Grab:
 
         cv2.imshow("feed", feed_roi)
 
-        text = pytesseract.image_to_string(feed_roi, lang="eng", config="--psm 6 --oem 1")
-        text = text.split('\n')[:-1]
+        text = pytesseract.image_to_string(feed_roi, lang="eng", config="--psm 6 --oem 1").split('\n')[:-1]
+        # text = text.split('\n')[:-1]
 
 
 
@@ -234,7 +242,8 @@ class Grab:
         print(players)
         player = self.isClip(players)
 
-        if player != None:
+        if player != None and self.grabPlayer(frame).lower() == player[1].lower():
+            print("clip found:", player[1])
             second = self.secondOfFrame(fts)
             # keep clan name?
             return {"player": player, "clip_range": f"https://www.youtube.com/watch?start={second-5}&end={second+5}&v={self.id}&ab_channel=CallofDutyLeague"}
