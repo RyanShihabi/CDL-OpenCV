@@ -7,23 +7,27 @@ import time
 import cv2
 
 # try reading the entire screen
-frame_count = 24000
+# frame_count = 24000
 
-cap = cv2.VideoCapture("videos/Winners Round 2 _ @Dallas Empire vs @Toronto Ultra _ Championship Weekend _ Day 2-OTsYiHhrDPw.mp4")
-cap.set(cv2.CAP_PROP_POS_FRAMES, 24000)
+cap = cv2.VideoCapture("videos/count.mp4")
 
 while cap.isOpened():
 # while fvs.more():
     # frame = fvs.read()
     ret, frame = cap.read()
 
-    cv2.imshow("Frame", frame)
-    print(frame_count)
+    # cv2.imshow("Frame", frame)
+    # print(frame_count)
 
-    frame_count += 1
+    # frame_count += 1
+
+    if ret:
+        cv2.imshow("Frame", frame)
+    else:
+        break
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
 cv2.destroyAllWindows()
-fvs.stop()
+print("done")

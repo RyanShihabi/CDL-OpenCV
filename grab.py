@@ -123,12 +123,18 @@ class Grab:
         text = []
 
         #1080 roi
+        # [500:700, 0:175]
         feed_roi = frame[500:700, 0:175]
 
         width = int(feed_roi.shape[1] * 200 / 100)
         height = int(feed_roi.shape[0] * 200 / 100)
 
         feed_roi = cv2.resize(feed_roi, (width, height), interpolation = cv2.INTER_AREA)
+
+        # kernel = np.array([[0, -1, 0],
+        #                     [-1, 5,-1],
+        #                     [0, -1, 0]])
+        # feed_roi = cv2.filter2D(feed_roi, -1, kernel)
 
         feed_roi = cv2.medianBlur(feed_roi, 1)
 
