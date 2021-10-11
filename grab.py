@@ -243,7 +243,9 @@ class Grab:
             if len(line) > 4:
                 if line[0] in ['[', '(', '|', '{'] or line[4] in [']', ')', '|', '}']:
                     # make it so the brackets dont make it into the clan abbreviation
-                    players.append(line.split(" ")[:2])
+                    player = line.split(" ")[:2]
+                    name = player[1].split("-")[0]
+                    players.append([player[0], name])
 
         print(players)
         player = self.isClip(players)
