@@ -122,11 +122,10 @@ def main():
 
     maps = []
     clips = {"clips": []}
-    grab = Grab()
     for video in videos:
         if video[0] not in completed_videos:
             hsv_values = grabTeamHSV(video[0])
-            grab = Grab(hsv_values)
+            grab = Grab(video[1])
             # Trying 720p30 with no audio to see if performance increases format code 136
             # Feeds may need 1080: yes format code 299
             # figure out option commands for format and no audio
@@ -141,6 +140,8 @@ def main():
             frame_count = 0
                 while cap.isOpened():
                     ret, frame = cap.read()
+
+                    if ret:
 
                     if (frame_count % 30 == 0) and (len(colors) > 0) and (len(maps) == rounds):
                         try:

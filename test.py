@@ -3,6 +3,7 @@ import pytesseract
 import argparse
 import numpy as np
 import cv2
+import json
 import os
 
 ap = argparse.ArgumentParser()
