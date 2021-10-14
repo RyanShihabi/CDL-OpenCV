@@ -174,14 +174,17 @@ def main():
                     cv2.imshow("Frame", frame)
                     frame_count += 1
 
+                with open("../data/preprocessed/clips.json", "w+") as f:
+                    json.dump(clips, f)
+                f.close()
 
                 with open("videos/completed.txt", "a+") as f:
                     f.write(video[0])
                 f.close()
-            #determine what metric considers completion
-                # json file export or download of the video
-                # maybe also use a downloaded.txt to determine what videos still need to be downloaded
-                # or put both metrics into one file to save space
+
+            #upload json to mongo
+                # maybe filter first
+
     with open(f"data/processed/clips.json", "w+") as json_file:
         json.dump(clips, json_file)
 

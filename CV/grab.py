@@ -138,7 +138,7 @@ class Grab:
 
         feed_roi = cv2.medianBlur(feed_roi, 1)
 
-        cv2.imshow("feed", feed_roi)
+        # cv2.imshow("feed", feed_roi)
 
         text = pytesseract.image_to_string(feed_roi, lang="eng", config="--psm 6 --oem 1").split('\n')[:-1]
         # text = text.split('\n')[:-1]
@@ -254,7 +254,9 @@ class Grab:
             print("clip found:", player[1])
             second = self.secondOfFrame(fts)
             # keep clan name?
-            return {"player": player, "clip_range": f"https://www.youtube.com/watch?start={second-5}&end={second+5}&v={self.id}&ab_channel=CallofDutyLeague"}
+            # "https://www.youtube.com/embed/OTsYiHhrDPw?&start=692&end=702"
+
+            return {"player": player, "clip_range": f"https://www.youtube.com/embed/{self.id}?&start={second-5}&end={second+5}"}
             # Dont need to check if second is less than 5, wont happen games dont start until later
 
         return None

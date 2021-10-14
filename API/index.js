@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 const app = express();
 
-mongoose.connect('mongodb://localhost/data');
+mongoose.connect('mongodb://localhost/CDL');
 mongoose.Promise = global.Promise;
 
 app.use(express.static('public'));
@@ -18,6 +18,8 @@ app.use(function(err, req, res, next){
 
 // app.get("/api", (req, res) => res.send("API is functional"));
 
-app.listen(process.env.port || 4000, function(){
+app.listen(process.env.port || 27017, function(){
   console.log("Listening for requests");
 });
+
+// module.exports = router;
