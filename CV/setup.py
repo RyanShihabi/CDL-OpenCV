@@ -10,6 +10,22 @@ import cv2
 # start downloading videos
 #
 
+def addData(data):
+    if playerCol.find_one({"player": player}) == None:
+        print("creating a new document")
+        playerCol.insert_one(data)
+    else:
+        print("appending clip to existing document")
+        playerCol.update_one(
+            {"player": data["player"]},
+            {
+                "$push":
+                {
+                    "clips": data["clips"]
+                }
+            }
+        )
+
 def grabTeamColors(frame) -> list:
     colors = []
     dim_threshold = 2.3
@@ -56,7 +72,7 @@ def grabTeamColors(frame) -> list:
     return colors
 
 
-teams = []
+# teams = []
         # "Dallas Empire": {"bounds": [], "color_space": "BGR"},
         # "Florida Mutineers": {"bounds": [], "color_space": "BGR"},
         # "London Royal Ravens": {"bounds": [], "color_space": "BGR"},
@@ -68,8 +84,8 @@ teams = []
         # "Seattle Surge": {"bounds": [], "color_space": "BGR"},
         # "Optic Chicago": {"bounds": [], "color_space": "BGR"}}
 
-teamHSV = {"Toronto Ultra": [np.array([0, 0, 177], np.uint8), np.array([179, 55, 255], np.uint8)],
-            "Atlanta FaZe": [np.array([0, 68, 120], np.uint8), np.array([179, 205, 255], np.uint8)]}
+# teamHSV = {"Toronto Ultra": [np.array([0, 0, 177], np.uint8), np.array([179, 55, 255], np.uint8)],
+#             "Atlanta FaZe": [np.array([0, 68, 120], np.uint8), np.array([179, 205, 255], np.uint8)]}
 
 def grabTeams(self, title) -> list:
 # "Champs Final | @Toronto Ultra vs @Atlanta FaZe | Championship Weekend | Day 4"
@@ -111,7 +127,7 @@ def main():
     videos = []
 
     for i in data["entries"]:
-        videos.append([i['title'], i['id']])
+        videos.append([i['title'], i['id']], i['upload_date'])
 
     # once video is downloaded, add to completed.txt
     completed_videos = []
@@ -125,7 +141,7 @@ def main():
     for video in videos:
         if video[0] not in completed_videos:
             hsv_values = grabTeamHSV(video[0])
-            grab = Grab(video[1])
+            grab = Grab(video[1], video[2])
             # Trying 720p30 with no audio to see if performance increases format code 136
             # Feeds may need 1080: yes format code 299
             # figure out option commands for format and no audio
@@ -142,45 +158,79 @@ def main():
                     ret, frame = cap.read()
 
                     if ret:
+                            # cv2.imshow("Frame", frame)
+                        if (frame_count % 30 == 0) and (len(colors) > 0):
+                            # print(frame_count)
+                            inGame = grab.inGame(frame)
+                            # print(inGame)
+                            if inGame:
+                                try:
+                                    clip = grab.grabFeed(frame, frame_count)
+                                    if clip != None:
+                                        print("clip found")
+                                        clips["players"].append(clip)
+                                        cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + 300)
+                                        frame_count += 300
+                                        # skip five seconds worth of frames as clips range 5 seconds back and forward
+                                        # 5 seconds in terms of 60 frames per second
+                                except Exception as e:
+                                    print(e)
+                            else:
+                                # map = grab.grabMapName(frame)
+                                # print(map)
+                                #
+                                # if map != "None":
+                                #     skip_iter = 0
+                                #     print("Map detected:", map)
+                                #     maps.append(map)
+                                #     cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + map_skip)
+                                #     frame_count += map_skip
+                                #     continue
 
-                    if (frame_count % 30 == 0) and (len(colors) > 0) and (len(maps) == rounds):
-                        try:
-                            clip = grab.grabFeed(frame, maps[-1], "TestVideo", frame_count)
-                            if clip != None:
-                                print("clip found")
-                                clips["clips"].append(clip)
-                                cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + 300)
-                                frame_count += 300
-                                # skip five seconds worth of frames as clips range 5 seconds back and forward
-                                # 5 seconds in terms of 60 frames per second
-                        except Exception as e:
-                            print(e)
-                    else:
-                        if frame_count % 30 == 0:
-                            map = grab.grabMapName(frame)
-
-                            if map != "None":
-                                print("Map detected:", map)
-                                maps.append(map)
-                                cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + map_skip)
-                                frame_count += map_skip
+                                # if map == "Skip":
+                                #     cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + intro_skip)
+                                #     frame_count += intro_skip
+                                #     continue
+                                # else:
+                                #     skip_count = int(599*(0.9**skip_iter)+1)
+                                #     print(f"skipping {skip_count} frames")
+                                #     cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + skip_count)
+                                #     frame_count += skip_count
+                                #     skip_iter += 1
+                                # print("not in game")
+                                cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + intro_skip)
+                                frame_count += intro_skip
                                 continue
+                        else:
+                            if len(colors) == 0:
+                                # print("looking for colors")
+                                # 28053
+                                inGame = grab.inGame(frame)
+                                print(inGame)
+                                if inGame:
+                                    colors = grabTeamColors(frame)
+                                    print("Found colors: ", colors)
+                                    grab.setBounds(colors)
+                                else:
+                                    # print("fast-forwarding to color: ", frame_count)
+                                    cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + intro_skip)
+                                    frame_count += intro_skip
+                                    continue
 
-                            if len(maps) == rounds:
-                                colors = grabTeamColors(frame)
-                                print(colors)
-                                grab.setBounds(colors)
+                        frame_count += 1
+                    else:
+                        break
 
-                    cv2.imshow("Frame", frame)
-                    frame_count += 1
-
-                with open("../data/preprocessed/clips.json", "w+") as f:
-                    json.dump(clips, f)
-                f.close()
+                # with open("../data/preprocessed/clips.json", "w+") as f:
+                #     json.dump(clips, f)
+                # f.close()
 
                 with open("videos/completed.txt", "a+") as f:
                     f.write(video[0])
                 f.close()
+
+                for clip in clips["Players"]:
+
 
             #upload json to mongo
                 # maybe filter first

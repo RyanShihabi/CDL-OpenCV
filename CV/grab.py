@@ -1,23 +1,32 @@
 import pytesseract
 import numpy as np
 import imutils
+import datetime
 import cv2
 
 class Grab:
-    def __init__(self, id="", bounds=[{'bounds': [np.array([56,  90, 255], dtype=np.uint8), np.array([57,  91, 255], dtype=np.uint8)], 'color_space': 'BGR'}, {'bounds': [np.array([255, 255, 255], dtype=np.uint8), np.array([255, 255, 255], dtype=np.uint8)], 'color_space': 'HLS'}]):
+    def __init__(self, id, date, bounds):
         self.bounds = bounds
         self.id = id
+        self.date = date
 
     def getBounds(self) -> list:
         return self.bounds
+
+    def setBounds(self, bounds):
+        self.bounds = bounds
 
     def setId(self, id):
         print("setting id")
         self.id = id
 
-    def setBounds(self, bounds):
-        print("setting bounds")
-        self.bounds = bounds
+    def setDate(self, date):
+        print("setting date")
+        self.date = date
+
+    # def setBounds(self, bounds):
+    #     print("setting bounds")
+    #     self.bounds = bounds
 
     def grabPlayer(self, frame) -> str:
         player_roi = frame[940:990, 1355:1660]
@@ -32,11 +41,8 @@ class Grab:
 
         for i in range(0, len(players)):
             for j in range(i+1, len(players)):
-                if players[i] == players[j]:
+                if players[i][6:].lower() == players[j][6:].lower():
                     return players[i]
-                else:
-                    if players[i][1].lower() == players[j][1].lower():
-                        return players[i]
 
         return None
 
@@ -131,6 +137,7 @@ class Grab:
 
         feed_roi = cv2.resize(feed_roi, (width, height), interpolation = cv2.INTER_AREA)
 
+
         # kernel = np.array([[0, -1, 0],
         #                     [-1, 5,-1],
         #                     [0, -1, 0]])
@@ -138,11 +145,10 @@ class Grab:
 
         feed_roi = cv2.medianBlur(feed_roi, 1)
 
-        # cv2.imshow("feed", feed_roi)
+        cv2.imshow("feed", feed_roi)
 
         text = pytesseract.image_to_string(feed_roi, lang="eng", config="--psm 6 --oem 1").split('\n')[:-1]
         # text = text.split('\n')[:-1]
-
 
 
         # team1_lower = self.bounds[0]["bounds"][0]
@@ -245,18 +251,19 @@ class Grab:
                     # make it so the brackets dont make it into the clan abbreviation
                     player = line.split(" ")[:2]
                     name = player[1].split("-")[0]
-                    players.append([player[0], name])
+                    players.append(f"{player[0]} {name}")
 
         print(players)
         player = self.isClip(players)
+        # print(player[6:].lower())
 
-        if player != None and self.grabPlayer(frame).lower() == player[1].lower():
-            print("clip found:", player[1])
+        if player != None and self.grabPlayer(frame).lower() == player[6:].lower():
+            print("clip found:", player)
             second = self.secondOfFrame(fts)
             # keep clan name?
             # "https://www.youtube.com/embed/OTsYiHhrDPw?&start=692&end=702"
 
-            return {"player": player, "clip_range": f"https://www.youtube.com/embed/{self.id}?&start={second-5}&end={second+5}"}
+            return {"player": player, "clip_range": f"https://www.youtube.com/embed/{self.id}?&start={second-5}&end={second+5}", "date": datetime.datetime(int(self.date[:4]), int(self.date[4:6]), int(self.date[6:]))}
             # Dont need to check if second is less than 5, wont happen games dont start until later
 
         return None
