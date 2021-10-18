@@ -5,7 +5,7 @@ import datetime
 import cv2
 
 class Grab:
-    def __init__(self, id, date, bounds):
+    def __init__(self, id, date, bounds=None):
         self.bounds = bounds
         self.id = id
         self.date = date
@@ -145,7 +145,7 @@ class Grab:
 
         feed_roi = cv2.medianBlur(feed_roi, 1)
 
-        cv2.imshow("feed", feed_roi)
+        # cv2.imshow("feed", feed_roi)
 
         text = pytesseract.image_to_string(feed_roi, lang="eng", config="--psm 6 --oem 1").split('\n')[:-1]
         # text = text.split('\n')[:-1]
@@ -263,7 +263,7 @@ class Grab:
             # keep clan name?
             # "https://www.youtube.com/embed/OTsYiHhrDPw?&start=692&end=702"
 
-            return {"player": player, "clip_range": f"https://www.youtube.com/embed/{self.id}?&start={second-5}&end={second+5}", "date": datetime.datetime(int(self.date[:4]), int(self.date[4:6]), int(self.date[6:]))}
+            return {"player": player, "clip_url": f"https://www.youtube.com/embed/{self.id}?&start={second-5}&end={second+5}", "date": self.date}
             # Dont need to check if second is less than 5, wont happen games dont start until later
 
         return None

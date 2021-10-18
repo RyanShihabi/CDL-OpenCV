@@ -4,27 +4,17 @@ import pathlib
 import json
 import datetime
 import numpy as np
+from pymongo import MongoClient
 import grab
 import cv2
 
 # start downloading videos
 #
 
-def addData(data):
-    if playerCol.find_one({"player": player}) == None:
-        print("creating a new document")
-        playerCol.insert_one(data)
-    else:
-        print("appending clip to existing document")
-        playerCol.update_one(
-            {"player": data["player"]},
-            {
-                "$push":
-                {
-                    "clips": data["clips"]
-                }
-            }
-        )
+client = MongoClient('mongodb+srv://admin:7pPNMQZHfblHXlUg@cdlcluster.shvz6.mongodb.net/CDL?retryWrites=true&w=majority')
+
+db = client.CDL
+playerCol = db.Players
 
 def grabTeamColors(frame) -> list:
     colors = []
@@ -137,10 +127,10 @@ def main():
     f.close()
 
     maps = []
-    clips = {"clips": []}
+    clips = {"Players": []}
     for video in videos:
         if video[0] not in completed_videos:
-            hsv_values = grabTeamHSV(video[0])
+            # hsv_values = grabTeamHSV(video[0])
             grab = Grab(video[1], video[2])
             # Trying 720p30 with no audio to see if performance increases format code 136
             # Feeds may need 1080: yes format code 299
@@ -168,7 +158,7 @@ def main():
                                     clip = grab.grabFeed(frame, frame_count)
                                     if clip != None:
                                         print("clip found")
-                                        clips["players"].append(clip)
+                                        clips["Players"].append(clip)
                                         cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + 300)
                                         frame_count += 300
                                         # skip five seconds worth of frames as clips range 5 seconds back and forward
@@ -230,15 +220,42 @@ def main():
                 f.close()
 
                 for clip in clips["Players"]:
+                    if playerCol.find_one({"player": clip["player"]}) == None:
+                        print("creating a new document")
+                        playerCol.insert_one({
+                            "player": clip["player"],
+                            "clips": [{
+                                "url": clip["clip_url"],
+                                "date": clip["date"],
+                            }]
+                        })
+                    else:
+                        print("appending clip to existing document")
+                        playerCol.update_one(
+                            {"player": clip["player"]},
+                            {
+                                "$push":
+                                {
+                                    "clips": {
+                                        "url": clip["clip_url"],
+                                        "date": clip["date"],
+                                        }
+                                        # sort values by datetime value
+                                        # figure out how to use $sort with datetime
+                                }
+                            }
+                        )
+
+                clips = {}
 
 
             #upload json to mongo
                 # maybe filter first
 
-    with open(f"data/processed/clips.json", "w+") as json_file:
-        json.dump(clips, json_file)
-
-    json_file.close()
+    # with open(f"data/processed/clips.json", "w+") as json_file:
+    #     json.dump(clips, json_file)
+    #
+    # json_file.close()
 
 if __name__ == "__main__":
     main()
