@@ -12,3 +12,4 @@ colorTest.py
 bgrTest.py
 node_modules/
 mongodbtest.py
+setupTest.py

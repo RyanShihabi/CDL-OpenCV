@@ -1,8 +1,7 @@
-from PIL import Image
+# coldb.from PIL import Image
 import pytesseract
 import argparse
 import numpy as np
-import grab
 import cv2
 import os
 
@@ -163,24 +162,9 @@ if args["detection"] == "feed":
     # players format [['clan tag', 'gamertag'], ...]
     players = []
     for line in text:
-        # for line in lines:
-        if len(line) > 4:
-            if line[0] in ['[', '(', '|', '{'] or line[4] in [']', ')', '|', '}']:
-                # make it so the brackets dont make it into the clan abbreviation
-                player = line.split(" ")[:2]
-                name = player[1].split("-")[0]
-                players.append(f"{player[0]} {name}")
+        if line[0] in ['[', '(']:
+            players.append(line.split(" ")[:2])
 
-    print(players[0][6:])
-
-    if len(players) < 2:
-        print(None)
-
-    for i in range(0, len(players)):
-        for j in range(i+1, len(players)):
-            if players[i][6:].lower() == players[j][6:].lower():
-                print(players[i])
-
-    print(None)
+    print(players)
     # print(isClip(players))
     # print(isClip([['[ATL]', 'gamertag'], ['(Atl]', 'gamertag']]))

@@ -5,7 +5,7 @@ import json
 import datetime
 import numpy as np
 from pymongo import MongoClient
-import grab
+from grab import Grab
 import cv2
 
 # start downloading videos
@@ -84,29 +84,32 @@ def grabTeams(self, title) -> list:
 
 def main():
     playlist = "PLisfUdjySbZVoTRbAlfObs8dI-cb-gWk-"
+    colors = []
+    inGame = False
+    intro_skip = 600
 
     timestamp = str(datetime.datetime.now())[:10]
 
-    if path.exists(f"data/playlist/{timestamp}.json") == False:
+    if os.path.exists(f"../data/playlist/{timestamp}.json") == False:
         print("Grabbing playlist information...")
-        os.system(f"youtube-dl --dump-single-json {playlist} > data/playlist/{timestamp}.json")
+        os.system(f"yt-dlp --dump-single-json {playlist} > ../data/playlist/{timestamp}.json")
 
-    dates = []
-    earliest_date = ""
-    for path in pathlib.Path("./data/playlist").iterdir():
-        date = str(path)[14:-5]
-        dates.append(date)
+    # dates = []
+    # earliest_date = ""
+    # for path in pathlib.Path("../data/playlist").iterdir():
+    #     date = str(path)[14:-5]
+    #     dates.append(date)
+    #
+    # dates = sorted(dates, key=lambda x: datetime.datetime.strptime(x, "%Y-%m-%d"))
+    #
+    # print(dates)
+    #
+    # while len(dates) > 2:
+    #     print("Cleaning list...")
+    #     os.remove(f"data/playlist/{dates[0]}.json")
+    #     dates.pop(0)
 
-    dates = sorted(dates, key=lambda x: datetime.datetime.strptime(x, "%Y-%m-%d"))
-
-    print(dates)
-
-    while len(dates) > 2:
-        print("Cleaning list...")
-        os.remove(f"data/playlist/{dates[0]}.json")
-        dates.pop(0)
-
-    f = open(f"data/playlist/{timestamp}.json",)
+    f = open(f"../data/playlist/{timestamp}.json",)
 
     data = json.load(f)
 
@@ -117,99 +120,99 @@ def main():
     videos = []
 
     for i in data["entries"]:
-        videos.append([i['title'], i['id']], i['upload_date'])
+        videos.append([i['title'], i['id'], i['upload_date']])
 
-    # once video is downloaded, add to completed.txt
+    # check for completed videos
     completed_videos = []
-    with open("videos/completed.txt", "r+") as f:
+    with open("../data/processed/completed.txt", "r+") as f:
         for line in f.readlines():
             completed_videos.append(line)
     f.close()
 
-    maps = []
+    # print(videos[0])
+    # return
+    # maps = []
     clips = {"Players": []}
     for video in videos:
         if video[0] not in completed_videos:
             # hsv_values = grabTeamHSV(video[0])
             grab = Grab(video[1], video[2])
             # Trying 720p30 with no audio to see if performance increases format code 136
-            # Feeds may need 1080: yes format code 299
+            # Feeds may need 1080: format code 299
             # figure out option commands for format and no audio
-            if path.isfile(f"{video[0]}.mp4") == False;
-                os.system(f"youtube-dl -f 299 {video[1]}")
-
+            if path.isfile(f"videos/{video[0]}.mp4") == False:
+                os.system(f"yt-dlp -f 299 {video[1]} -o '~/Desktop/CS/CDL OpenCV/CV/videos/{video[0]}.mp4'")
             # Implement time extraction
             # Make sure the download is cancelled if not completed
 
-
             cap = cv2.VideoCapture(f"videos/{video[0]}.mp4")
-            frame_count = 0
-                while cap.isOpened():
-                    ret, frame = cap.read()
+            cap.set(cv2.CAP_PROP_POS_FRAMES, 24000)
+            frame_count = 24000
 
-                    if ret:
-                            # cv2.imshow("Frame", frame)
-                        if (frame_count % 30 == 0) and (len(colors) > 0):
-                            # print(frame_count)
+            while cap.isOpened():
+                ret, frame = cap.read()
+
+                if ret:
+                    # inGame = grab.inGame(frame)
+                    # cv2.imshow("Frame", frame)
+                    if (frame_count % 30 == 0) and (len(colors) > 0):
+                        inGame = grab.inGame(frame)
+                        if inGame:
+                            try:
+                                clip = grab.grabFeed(frame, frame_count)
+                                if clip != None:
+                                    print("clip found")
+                                    clips["Players"].append(clip)
+                                    cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + 300)
+                                    frame_count += 300
+                                    continue
+                                    # skip five seconds worth of frames as clips range 5 seconds back and forward
+                                    # 5 seconds in terms of 60 frames per second
+                            except Exception as e:
+                                print(e)
+                        else:
+                            # map = grab.grabMapName(frame)
+                            # print(map)
+                            #
+                            # if map != "None":
+                            #     skip_iter = 0
+                            #     print("Map detected:", map)
+                            #     maps.append(map)
+                            #     cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + map_skip)
+                            #     frame_count += map_skip
+                            #     continue
+
+                            # if map == "Skip":
+                            #     cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + intro_skip)
+                            #     frame_count += intro_skip
+                            #     continue
+                            # else:
+                            #     skip_count = int(599*(0.9**skip_iter)+1)
+                            #     print(f"skipping {skip_count} frames")
+                            #     cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + skip_count)
+                            #     frame_count += skip_count
+                            #     skip_iter += 1
+                            # print("not in game")
+                            cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + intro_skip)
+                            frame_count += intro_skip
+                            continue
+                    else:
+                        if len(colors) == 0 :
                             inGame = grab.inGame(frame)
                             # print(inGame)
                             if inGame:
-                                try:
-                                    clip = grab.grabFeed(frame, frame_count)
-                                    if clip != None:
-                                        print("clip found")
-                                        clips["Players"].append(clip)
-                                        cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + 300)
-                                        frame_count += 300
-                                        # skip five seconds worth of frames as clips range 5 seconds back and forward
-                                        # 5 seconds in terms of 60 frames per second
-                                except Exception as e:
-                                    print(e)
+                                colors = grabTeamColors(frame)
+                                print("Found colors: ", colors)
+                                grab.setBounds(colors)
                             else:
-                                # map = grab.grabMapName(frame)
-                                # print(map)
-                                #
-                                # if map != "None":
-                                #     skip_iter = 0
-                                #     print("Map detected:", map)
-                                #     maps.append(map)
-                                #     cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + map_skip)
-                                #     frame_count += map_skip
-                                #     continue
-
-                                # if map == "Skip":
-                                #     cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + intro_skip)
-                                #     frame_count += intro_skip
-                                #     continue
-                                # else:
-                                #     skip_count = int(599*(0.9**skip_iter)+1)
-                                #     print(f"skipping {skip_count} frames")
-                                #     cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + skip_count)
-                                #     frame_count += skip_count
-                                #     skip_iter += 1
-                                # print("not in game")
+                                # print("fast-forwarding to color: ", frame_count)
                                 cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + intro_skip)
                                 frame_count += intro_skip
                                 continue
-                        else:
-                            if len(colors) == 0:
-                                # print("looking for colors")
-                                # 28053
-                                inGame = grab.inGame(frame)
-                                print(inGame)
-                                if inGame:
-                                    colors = grabTeamColors(frame)
-                                    print("Found colors: ", colors)
-                                    grab.setBounds(colors)
-                                else:
-                                    # print("fast-forwarding to color: ", frame_count)
-                                    cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + intro_skip)
-                                    frame_count += intro_skip
-                                    continue
 
-                        frame_count += 1
-                    else:
-                        break
+                    frame_count += 1
+                else:
+                    break
 
                 # with open("../data/preprocessed/clips.json", "w+") as f:
                 #     json.dump(clips, f)
@@ -248,10 +251,12 @@ def main():
 
                 clips = {}
 
+                os.remove(f"videos/{video[0]}.mp4")
+
 
             #upload json to mongo
                 # maybe filter first
-
+    os.remove(f"../data/playlist/{timestamp}.json")
     # with open(f"data/processed/clips.json", "w+") as json_file:
     #     json.dump(clips, json_file)
     #
