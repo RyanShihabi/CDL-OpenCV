@@ -171,28 +171,6 @@ def main():
                             except Exception as e:
                                 print(e)
                         else:
-                            # map = grab.grabMapName(frame)
-                            # print(map)
-                            #
-                            # if map != "None":
-                            #     skip_iter = 0
-                            #     print("Map detected:", map)
-                            #     maps.append(map)
-                            #     cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + map_skip)
-                            #     frame_count += map_skip
-                            #     continue
-
-                            # if map == "Skip":
-                            #     cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + intro_skip)
-                            #     frame_count += intro_skip
-                            #     continue
-                            # else:
-                            #     skip_count = int(599*(0.9**skip_iter)+1)
-                            #     print(f"skipping {skip_count} frames")
-                            #     cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + skip_count)
-                            #     frame_count += skip_count
-                            #     skip_iter += 1
-                            # print("not in game")
                             cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + intro_skip)
                             frame_count += intro_skip
                             continue
@@ -214,44 +192,40 @@ def main():
                 else:
                     break
 
-                # with open("../data/preprocessed/clips.json", "w+") as f:
-                #     json.dump(clips, f)
-                # f.close()
+            with open("videos/completed.txt", "a+") as f:
+                f.write(video[0])
+            f.close()
 
-                with open("videos/completed.txt", "a+") as f:
-                    f.write(video[0])
-                f.close()
-
-                for clip in clips["Players"]:
-                    if playerCol.find_one({"player": clip["player"]}) == None:
-                        print("creating a new document")
-                        playerCol.insert_one({
-                            "player": clip["player"],
-                            "clips": [{
-                                "url": clip["clip_url"],
-                                "date": clip["date"],
-                            }]
-                        })
-                    else:
-                        print("appending clip to existing document")
-                        playerCol.update_one(
-                            {"player": clip["player"]},
+            for clip in clips["Players"]:
+                if playerCol.find_one({"player": clip["player"]}) == None:
+                    print("creating a new document")
+                    playerCol.insert_one({
+                        "player": clip["player"],
+                        "clips": [{
+                            "url": clip["clip_url"],
+                            "date": clip["date"],
+                        }]
+                    })
+                else:
+                    print("appending clip to existing document")
+                    playerCol.update_one(
+                        {"player": clip["player"]},
+                        {
+                            "$push":
                             {
-                                "$push":
-                                {
-                                    "clips": {
-                                        "url": clip["clip_url"],
-                                        "date": clip["date"],
-                                        }
-                                        # sort values by datetime value
-                                        # figure out how to use $sort with datetime
-                                }
+                                "clips": {
+                                    "url": clip["clip_url"],
+                                    "date": clip["date"],
+                                    }
+                                    # sort values by datetime value
+                                    # figure out how to use $sort with datetime
                             }
-                        )
+                        }
+                    )
 
-                clips = {}
+            clips = {"Players": []}
 
-                os.remove(f"videos/{video[0]}.mp4")
+            os.remove(f"videos/{video[0]}.mp4")
 
 
             #upload json to mongo
