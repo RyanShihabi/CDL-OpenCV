@@ -98,8 +98,8 @@ def main():
     # check for completed videos
     completed_videos = []
     with open("../data/processed/completed.txt", "r+") as f:
-        for line in f.readlines():
-            completed_videos.append(line)
+        for line in f:
+            completed_videos.append(line.split("\n")[0])
     f.close()
 
     # maps = []
@@ -139,7 +139,8 @@ def main():
                                     # skip five seconds worth of frames as clips range 5 seconds back and forward
                                     # 5 seconds in terms of 60 frames per second
                             except Exception as e:
-                                print(e)
+                                pass
+                                # print(e)
                         else:
                             cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + intro_skip)
                             frame_count += intro_skip

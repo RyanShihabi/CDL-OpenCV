@@ -243,6 +243,7 @@ class Grab:
         # text.append(team2_text)
 
         # players format [['clan tag', 'gamertag'], ...]
+        # print(text)
         players = []
         for line in text:
             # for line in lines:
@@ -253,7 +254,7 @@ class Grab:
                     name = player[1].split("-")[0]
                     players.append(f"{player[0]} {name}")
 
-        # print(players)
+        print(players)
         player = self.isClip(players)
         # print(player[6:].lower())
 
