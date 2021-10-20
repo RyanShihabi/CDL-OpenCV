@@ -160,7 +160,7 @@ def main():
                 else:
                     break
 
-            with open("videos/completed.txt", "a+") as f:
+            with open("../data/processed/completed.txt", "a+") as f:
                 f.write(video[0])
             f.close()
 
