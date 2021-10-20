@@ -130,7 +130,7 @@ class Grab:
 
         #1080 roi
         # [500:700, 0:175]
-        feed_roi = frame[500:700, 0:175]
+        feed_roi = frame[450:750, 0:230]
 
         width = int(feed_roi.shape[1] * 200 / 100)
         height = int(feed_roi.shape[0] * 200 / 100)
@@ -260,7 +260,7 @@ class Grab:
 
         if player != None and self.grabPlayer(frame).lower() == player[6:].lower():
             second = self.secondOfFrame(fts)
-            print(f"clip found for {player} from {second-5} to {second+5}")
+            print(f"clip found for {player} from {second-5} to {second+6}")
             # keep clan name?
             # "https://www.youtube.com/embed/OTsYiHhrDPw?&start=692&end=702"
 
