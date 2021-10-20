@@ -32,7 +32,7 @@ class Grab:
         player_roi = frame[940:990, 1355:1660]
 
         text = pytesseract.image_to_string(player_roi, lang="eng", config="--psm 6 --oem 1").split("\n")[0]
-        print(text)
+        # print(text)
         return text
 
     def isClip(self, players) -> list:
@@ -258,12 +258,12 @@ class Grab:
         # print(player[6:].lower())
 
         if player != None and self.grabPlayer(frame).lower() == player[6:].lower():
-            print("clip found:", player)
             second = self.secondOfFrame(fts)
+            print(f"clip found for {player} from {second-5} to {second+5}")
             # keep clan name?
             # "https://www.youtube.com/embed/OTsYiHhrDPw?&start=692&end=702"
 
-            return {"player": player, "clip_url": f"https://www.youtube.com/embed/{self.id}?&start={second-5}&end={second+5}", "date": self.date}
+            return {"player": player, "clip_url": f"https://www.youtube.com/embed/{self.id}?&start={second-5}&end={second+6}", "date": self.date}
             # Dont need to check if second is less than 5, wont happen games dont start until later
 
         return None

@@ -5,6 +5,7 @@ import json
 import datetime
 import numpy as np
 from pymongo import MongoClient
+from pprint import pprint
 from grab import Grab
 import cv2
 
@@ -12,6 +13,9 @@ client = MongoClient('mongodb+srv://admin:7pPNMQZHfblHXlUg@cdlcluster.shvz6.mong
 
 db = client.CDL
 playerCol = db.Players
+
+serverStatusResult = db.command("serverStatus")
+pprint(serverStatusResult)
 
 def grabTeamColors(frame) -> list:
     colors = []
@@ -127,7 +131,7 @@ def main():
                             try:
                                 clip = grab.grabFeed(frame, frame_count)
                                 if clip != None:
-                                    print("clip found")
+                                    # print("clip found")
                                     clips["Players"].append(clip)
                                     cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + 300)
                                     frame_count += 300
