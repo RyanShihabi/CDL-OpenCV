@@ -77,7 +77,7 @@ class Grab:
 
         roi = frame[1013:1014, 1455:1456]
         b, g, r = roi[0, 0]
-        print([b, g, r])
+        # print([b, g, r])
 
         if (150 <= b <= 255) and (150 <= g <= 255) and (106 <= r <= 255):
             return True
@@ -106,7 +106,7 @@ class Grab:
         #
         # text = text.split(" ")[0]
 
-        print(text)
+        # print(text)
 
         for map in maps:
             if text == map:
@@ -253,7 +253,7 @@ class Grab:
                     name = player[1].split("-")[0]
                     players.append(f"{player[0]} {name}")
 
-        print(players)
+        # print(players)
         player = self.isClip(players)
         # print(player[6:].lower())
 

@@ -8,9 +8,6 @@ from pymongo import MongoClient
 from grab import Grab
 import cv2
 
-# start downloading videos
-#
-
 client = MongoClient('mongodb+srv://admin:7pPNMQZHfblHXlUg@cdlcluster.shvz6.mongodb.net/CDL?retryWrites=true&w=majority')
 
 db = client.CDL
@@ -61,19 +58,6 @@ def grabTeamColors(frame) -> list:
 
     return colors
 
-
-# teams = []
-        # "Dallas Empire": {"bounds": [], "color_space": "BGR"},
-        # "Florida Mutineers": {"bounds": [], "color_space": "BGR"},
-        # "London Royal Ravens": {"bounds": [], "color_space": "BGR"},
-        # "Los Angeles Guerrillas": {"bounds": [], "color_space": "BGR"},
-        # "Los Angeles Thieves": {"bounds": [], "color_space": "BGR"},
-        # "Minnesota ": {"bounds": [], "color_space": "BGR"},
-        # "New York Subliners": {"bounds": [], "color_space": "BGR"},
-        # "Paris Legion": {"bounds": [], "color_space": "BGR"},
-        # "Seattle Surge": {"bounds": [], "color_space": "BGR"},
-        # "Optic Chicago": {"bounds": [], "color_space": "BGR"}}
-
 # teamHSV = {"Toronto Ultra": [np.array([0, 0, 177], np.uint8), np.array([179, 55, 255], np.uint8)],
 #             "Atlanta FaZe": [np.array([0, 68, 120], np.uint8), np.array([179, 205, 255], np.uint8)]}
 
@@ -93,21 +77,6 @@ def main():
     if os.path.exists(f"../data/playlist/{timestamp}.json") == False:
         print("Grabbing playlist information...")
         os.system(f"yt-dlp --dump-single-json {playlist} > ../data/playlist/{timestamp}.json")
-
-    # dates = []
-    # earliest_date = ""
-    # for path in pathlib.Path("../data/playlist").iterdir():
-    #     date = str(path)[14:-5]
-    #     dates.append(date)
-    #
-    # dates = sorted(dates, key=lambda x: datetime.datetime.strptime(x, "%Y-%m-%d"))
-    #
-    # print(dates)
-    #
-    # while len(dates) > 2:
-    #     print("Cleaning list...")
-    #     os.remove(f"data/playlist/{dates[0]}.json")
-    #     dates.pop(0)
 
     f = open(f"../data/playlist/{timestamp}.json",)
 
@@ -129,13 +98,10 @@ def main():
             completed_videos.append(line)
     f.close()
 
-    # print(videos[0])
-    # return
     # maps = []
     clips = {"Players": []}
     for video in videos:
         if video[0] not in completed_videos:
-            # hsv_values = grabTeamHSV(video[0])
             grab = Grab(video[1], video[2])
             # Trying 720p30 with no audio to see if performance increases format code 136
             # Feeds may need 1080: format code 299
@@ -149,12 +115,12 @@ def main():
             cap.set(cv2.CAP_PROP_POS_FRAMES, 24000)
             frame_count = 24000
 
+            print("Starting video:", video[0])
+
             while cap.isOpened():
                 ret, frame = cap.read()
 
                 if ret:
-                    # inGame = grab.inGame(frame)
-                    # cv2.imshow("Frame", frame)
                     if (frame_count % 30 == 0) and (len(colors) > 0):
                         inGame = grab.inGame(frame)
                         if inGame:
@@ -177,13 +143,11 @@ def main():
                     else:
                         if len(colors) == 0 :
                             inGame = grab.inGame(frame)
-                            # print(inGame)
                             if inGame:
                                 colors = grabTeamColors(frame)
                                 print("Found colors: ", colors)
                                 grab.setBounds(colors)
                             else:
-                                # print("fast-forwarding to color: ", frame_count)
                                 cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + intro_skip)
                                 frame_count += intro_skip
                                 continue
@@ -195,6 +159,9 @@ def main():
             with open("videos/completed.txt", "a+") as f:
                 f.write(video[0])
             f.close()
+
+            print("Finished video:", video[0])
+            print(clips)
 
             for clip in clips["Players"]:
                 if playerCol.find_one({"player": clip["player"]}) == None:
@@ -228,13 +195,8 @@ def main():
             os.remove(f"videos/{video[0]}.mp4")
 
 
-            #upload json to mongo
-                # maybe filter first
     os.remove(f"../data/playlist/{timestamp}.json")
-    # with open(f"data/processed/clips.json", "w+") as json_file:
-    #     json.dump(clips, json_file)
-    #
-    # json_file.close()
+    print("All data processed")
 
 if __name__ == "__main__":
     main()
