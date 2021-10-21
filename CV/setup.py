@@ -159,13 +159,13 @@ def main():
                                 print(nameRange[currPlayer])
                             else:
                                 if clipFound:
-                                    clip_range = [nameRange[prevPlayer][0], nameRange[prevPlayer][-1]]
-                                    nameRange[prevPlayer] = []
+                                    if len(nameRange) > 4
+                                        clip_range = [nameRange[prevPlayer][0], nameRange[prevPlayer][-1]]
+                                        nameRange[prevPlayer] = []
+                                        print("taking temp clip out for release")
+                                        clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.id}?&start={clip_range[0]//60}&end={clip_range[1]//60}", "date": grab.date})
 
-                                    print("taking temp clip out for release")
-                                    clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.id}?&start={clip_range[0]//60}&end={clip_range[1]//60}", "date": grab.date})
                                     temp_clips = []
-
                                     clipFound = False
 
                         else:
@@ -190,13 +190,13 @@ def main():
                     prevPlayer = currPlayer
                 else:
                     if clipFound:
-                        clip_range = [nameRange[prevPlayer][0], nameRange[prevPlayer][-1]]
-                        nameRange[prevPlayer] = []
+                        if len(nameRange) > 4
+                            clip_range = [nameRange[prevPlayer][0], nameRange[prevPlayer][-1]]
+                            nameRange[prevPlayer] = []
+                            print("taking temp clip out for release")
+                            clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.id}?&start={clip_range[0]//60}&end={clip_range[1]//60}", "date": grab.date})
 
-                        print("taking temp clip out for release")
-                        clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.id}?&start={clip_range[0]//60}&end={clip_range[1]//60}", "date": grab.date})
                         temp_clips = []
-
                         clipFound = False
                     break
 
