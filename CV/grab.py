@@ -272,15 +272,16 @@ class Grab:
 
         print(players)
         player = self.isClip(players)
+        camera = self.grabPlayer(frame).lower()
         # print(player[6:].lower())
 
-        if player != None and self.grabPlayer(frame).lower() == player[6:].lower():
+        if player != None and camera == player[6:].lower():
             second = self.secondOfFrame(fts)
-            print(f"clip found for {player} from {second-5} to {second+6}")
+            print(f"clip found for {player} from {second-8} to {second+8}")
             # keep clan name?
             # "https://www.youtube.com/embed/OTsYiHhrDPw?&start=692&end=702"
 
-            return {"player": player, "clip_url": f"https://www.youtube.com/embed/{self.id}?&start={second-3}&end={second+8}", "date": self.date}
+            return {"player": player, "clip_url": f"https://www.youtube.com/embed/{self.id}?&start={second-8}&end={second+8}", "date": self.date}
             # Dont need to check if second is less than 5, wont happen games dont start until later
 
         return None
