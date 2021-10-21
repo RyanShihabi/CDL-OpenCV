@@ -159,7 +159,7 @@ def main():
                                 print(nameRange[currPlayer])
                             else:
                                 if clipFound:
-                                    if len(nameRange) > 4:
+                                    if len(nameRange[prevPlayer]) > 4:
                                         clip_range = [nameRange[prevPlayer][0], nameRange[prevPlayer][-1]]
                                         nameRange[prevPlayer] = []
                                         print("taking temp clip out for release")
@@ -190,7 +190,7 @@ def main():
                     prevPlayer = currPlayer
                 else:
                     if clipFound:
-                        if len(nameRange) > 4:
+                        if len(nameRange[prevPlayer]) > 4:
                             clip_range = [nameRange[prevPlayer][0], nameRange[prevPlayer][-1]]
                             nameRange[prevPlayer] = []
                             print("taking temp clip out for release")
