@@ -123,7 +123,7 @@ class Grab:
 
         return 60 * 60 * (int(text)+1)
 
-    def grabFeed(self, frame, fts) -> dict:
+    def grabFeed(self, frame, fts, camera) -> dict:
         #720 roi
         # feed_roi = frame[350:500, 0:275]
         text = []
@@ -272,16 +272,17 @@ class Grab:
 
         print(players)
         player = self.isClip(players)
-        camera = self.grabPlayer(frame).lower()
+        # camera = self.grabPlayer(frame).lower()
         # print(player[6:].lower())
 
-        if player != None and camera == player[6:].lower():
+        if player != None and camera.lower() == player[6:].lower():
             second = self.secondOfFrame(fts)
-            print(f"clip found for {player} from {second-8} to {second+8}")
+            print(f"clip found for {player} at {second}")
             # keep clan name?
             # "https://www.youtube.com/embed/OTsYiHhrDPw?&start=692&end=702"
 
-            return {"player": player, "clip_url": f"https://www.youtube.com/embed/{self.id}?&start={second-8}&end={second+8}", "date": self.date}
+            # return {"player": player, "clip_url": f"https://www.youtube.com/embed/{self.id}?&start={second-8}&end={second+8}", "date": self.date}
+            return {"player": player, "frame": fts}
             # Dont need to check if second is less than 5, wont happen games dont start until later
 
         return None

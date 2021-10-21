@@ -118,31 +118,56 @@ def main():
             cap = cv2.VideoCapture(f"videos/{video[0]}.mp4")
             cap.set(cv2.CAP_PROP_POS_FRAMES, 24000)
             frame_count = 24000
+            prevPlayer = None
+            currPlayer = None
+            nameRange = {}
+            temp_clips = []
+            clipFound = False
 
             print("Starting video:", video[0])
 
             while cap.isOpened():
                 ret, frame = cap.read()
 
+                # only grab feed if team colors are initiated
+                # how will you figure out if you are inGame once a round is finished
                 if ret:
+                    # inGame = grab.inGame(frame)
+                    # cv2.imshow("Frame", frame)
                     if (frame_count % 30 == 0) and (len(colors) > 0):
-                        # print("running")
                         inGame = grab.inGame(frame)
                         if inGame:
-                            try:
-                                # print("running")
-                                clip = grab.grabFeed(frame, frame_count)
-                                if clip != None:
-                                    # print("clip found")
-                                    clips["Players"].append(clip)
-                                    # cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + 300)
-                                    # frame_count += 300
-                                    # continue
+                            currPlayer = grab.grabPlayer(frame)
+
+                            # try:
+                            clip = grab.grabFeed(frame, frame_count, currPlayer)
+                            if clip != None:
+                                clipFound = True
+                                print("clip found")
+                                temp_clips.append(clip)
                                     # skip five seconds worth of frames as clips range 5 seconds back and forward
                                     # 5 seconds in terms of 60 frames per second
-                            except Exception as e:
-                                pass
-                                # print(e)
+                            # except Exception as e:
+                            #     print(e)
+
+                            if prevPlayer == currPlayer:
+                                if currPlayer in nameRange:
+                                    nameRange[currPlayer].append(frame_count)
+                                else:
+                                    nameRange[currPlayer] = [frame_count]
+                                print(currPlayer)
+                                print(nameRange[currPlayer])
+                            else:
+                                if clipFound:
+                                    clip_range = [nameRange[prevPlayer][0], nameRange[prevPlayer][-1]]
+                                    nameRange[prevPlayer] = []
+
+                                    print("taking temp clip out for release")
+                                    clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.id}?&start={clip_range[0]//60}&end={clip_range[1]//60}", "date": grab.date})
+                                    temp_clips = []
+
+                                    clipFound = False
+
                         else:
                             cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + intro_skip)
                             frame_count += intro_skip
@@ -150,17 +175,29 @@ def main():
                     else:
                         if len(colors) == 0 :
                             inGame = grab.inGame(frame)
+                            # print(inGame)
                             if inGame:
                                 colors = grabTeamColors(frame)
                                 print("Found colors: ", colors)
                                 grab.setBounds(colors)
                             else:
+                                # print("fast-forwarding to color: ", frame_count)
                                 cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + intro_skip)
                                 frame_count += intro_skip
                                 continue
 
                     frame_count += 1
+                    prevPlayer = currPlayer
                 else:
+                    if clipFound:
+                        clip_range = [nameRange[prevPlayer][0], nameRange[prevPlayer][-1]]
+                        nameRange[prevPlayer] = []
+
+                        print("taking temp clip out for release")
+                        clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.id}?&start={clip_range[0]//60}&end={clip_range[1]//60}", "date": grab.date})
+                        temp_clips = []
+
+                        clipFound = False
                     break
 
             with open("../data/processed/completed.txt", "a+") as f:
