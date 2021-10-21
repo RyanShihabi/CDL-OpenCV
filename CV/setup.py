@@ -126,16 +126,18 @@ def main():
 
                 if ret:
                     if (frame_count % 30 == 0) and (len(colors) > 0):
+                        # print("running")
                         inGame = grab.inGame(frame)
                         if inGame:
                             try:
+                                # print("running")
                                 clip = grab.grabFeed(frame, frame_count)
                                 if clip != None:
                                     # print("clip found")
                                     clips["Players"].append(clip)
-                                    cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + 300)
-                                    frame_count += 300
-                                    continue
+                                    # cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + 300)
+                                    # frame_count += 300
+                                    # continue
                                     # skip five seconds worth of frames as clips range 5 seconds back and forward
                                     # 5 seconds in terms of 60 frames per second
                             except Exception as e:
@@ -172,7 +174,8 @@ def main():
                 if playerCol.find_one({"player": clip["player"]}) == None:
                     print("creating a new document")
                     playerCol.insert_one({
-                        "player": clip["player"],
+                        "player": clip["player"].split()[1],
+                        "team": clip["player"].split()[0],
                         "clips": [{
                             "url": clip["clip_url"],
                             "date": clip["date"],

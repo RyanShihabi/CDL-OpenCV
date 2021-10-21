@@ -127,27 +127,42 @@ class Grab:
         #720 roi
         # feed_roi = frame[350:500, 0:275]
         text = []
+        # print("running")
 
         #1080 roi
-        # [500:700, 0:175]
-        feed_roi = frame[450:750, 0:230]
+        # original: [500:700, 0:175]
+        pos1 = frame[630:670, 0:230]
+        pos2 = frame[595:635, 0:230]
+        pos3 = frame[560:600, 0:230]
 
-        width = int(feed_roi.shape[1] * 200 / 100)
-        height = int(feed_roi.shape[0] * 200 / 100)
+        width = int(pos1.shape[1] * 200 / 100)
+        height = int(pos1.shape[0] * 200 / 100)
 
-        feed_roi = cv2.resize(feed_roi, (width, height), interpolation = cv2.INTER_AREA)
+        pos1 = cv2.medianBlur(pos1, 1)
+        pos1 = cv2.resize(pos1, (width, height), interpolation = cv2.INTER_AREA)
 
+        width = int(pos2.shape[1] * 200 / 100)
+        height = int(pos2.shape[0] * 200 / 100)
 
-        # kernel = np.array([[0, -1, 0],
-        #                     [-1, 5,-1],
-        #                     [0, -1, 0]])
-        # feed_roi = cv2.filter2D(feed_roi, -1, kernel)
+        pos2 = cv2.medianBlur(pos2, 1)
+        pos2 = cv2.resize(pos2, (width, height), interpolation = cv2.INTER_AREA)
 
-        feed_roi = cv2.medianBlur(feed_roi, 1)
+        width = int(pos3.shape[1] * 200 / 100)
+        height = int(pos3.shape[0] * 200 / 100)
 
-        # cv2.imshow("feed", feed_roi)
+        pos3 = cv2.medianBlur(pos3, 1)
+        pos3 = cv2.resize(pos3, (width, height), interpolation = cv2.INTER_AREA)
 
-        text = pytesseract.image_to_string(feed_roi, lang="eng", config="--psm 6 --oem 1").split('\n')[:-1]
+        # print("running")
+
+        textP1 = pytesseract.image_to_string(pos1, lang="eng", config="--psm 6 --oem 1").split('\n')[0]
+        text.append(textP1)
+
+        textP2 = pytesseract.image_to_string(pos2, lang="eng", config="--psm 6 --oem 1").split('\n')[0]
+        text.append(textP2)
+
+        textP3 = pytesseract.image_to_string(pos3, lang="eng", config="--psm 6 --oem 1").split('\n')[0]
+        text.append(textP3)
         # text = text.split('\n')[:-1]
 
 
@@ -244,6 +259,7 @@ class Grab:
 
         # players format [['clan tag', 'gamertag'], ...]
         # print(text)
+
         players = []
         for line in text:
             # for line in lines:
@@ -264,7 +280,7 @@ class Grab:
             # keep clan name?
             # "https://www.youtube.com/embed/OTsYiHhrDPw?&start=692&end=702"
 
-            return {"player": player, "clip_url": f"https://www.youtube.com/embed/{self.id}?&start={second-5}&end={second+6}", "date": self.date}
+            return {"player": player, "clip_url": f"https://www.youtube.com/embed/{self.id}?&start={second-3}&end={second+8}", "date": self.date}
             # Dont need to check if second is less than 5, wont happen games dont start until later
 
         return None

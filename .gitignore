@@ -13,3 +13,4 @@ bgrTest.py
 node_modules/
 mongodbtest.py
 setupTest.py
+feedTest.py
