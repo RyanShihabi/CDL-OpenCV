@@ -129,6 +129,8 @@ class Grab:
         text = []
         # print("running")
 
+        frame = cv2.medianBlur(frame, 1)
+
         #1080 roi
         # original: [500:700, 0:175]
         pos1 = frame[630:670, 0:230]
@@ -137,23 +139,15 @@ class Grab:
 
         width = int(pos1.shape[1] * 200 / 100)
         height = int(pos1.shape[0] * 200 / 100)
-
-        pos1 = cv2.medianBlur(pos1, 1)
         pos1 = cv2.resize(pos1, (width, height), interpolation = cv2.INTER_AREA)
 
         width = int(pos2.shape[1] * 200 / 100)
         height = int(pos2.shape[0] * 200 / 100)
-
-        pos2 = cv2.medianBlur(pos2, 1)
         pos2 = cv2.resize(pos2, (width, height), interpolation = cv2.INTER_AREA)
 
         width = int(pos3.shape[1] * 200 / 100)
         height = int(pos3.shape[0] * 200 / 100)
-
-        pos3 = cv2.medianBlur(pos3, 1)
         pos3 = cv2.resize(pos3, (width, height), interpolation = cv2.INTER_AREA)
-
-        # print("running")
 
         textP1 = pytesseract.image_to_string(pos1, lang="eng", config="--psm 6 --oem 1").split('\n')[0]
         text.append(textP1)
@@ -265,15 +259,12 @@ class Grab:
             # for line in lines:
             if len(line) > 4:
                 if line[0] in ['[', '(', '|', '{'] or line[4] in [']', ')', '|', '}']:
-                    # make it so the brackets dont make it into the clan abbreviation
                     player = line.split(" ")[:2]
                     name = player[1].split("-")[0]
                     players.append(f"{player[0]} {name}")
 
         print(players)
         player = self.isClip(players)
-        # camera = self.grabPlayer(frame).lower()
-        # print(player[6:].lower())
 
         if player != None and camera.lower() == player[6:].lower():
             second = self.secondOfFrame(fts)

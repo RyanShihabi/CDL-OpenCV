@@ -139,16 +139,14 @@ def main():
                         if inGame:
                             currPlayer = grab.grabPlayer(frame)
 
-                            # try:
-                            clip = grab.grabFeed(frame, frame_count, currPlayer)
-                            if clip != None:
-                                clipFound = True
-                                print("clip found")
-                                temp_clips.append(clip)
-                                    # skip five seconds worth of frames as clips range 5 seconds back and forward
-                                    # 5 seconds in terms of 60 frames per second
-                            # except Exception as e:
-                            #     print(e)
+                            try:
+                                clip = grab.grabFeed(frame, frame_count, currPlayer)
+                                if clip != None:
+                                    clipFound = True
+                                    print("clip found")
+                                    temp_clips.append(clip)
+                            except Exception as e:
+                                print(e)
 
                             if prevPlayer == currPlayer:
                                 if currPlayer in nameRange:
@@ -159,6 +157,7 @@ def main():
                                 print(nameRange[currPlayer])
                             else:
                                 if clipFound:
+                                    # determine proper duration
                                     if len(nameRange[prevPlayer]) > 4:
                                         clip_range = [nameRange[prevPlayer][0], nameRange[prevPlayer][-1]]
                                         nameRange[prevPlayer] = []
