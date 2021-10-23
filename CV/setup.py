@@ -146,26 +146,29 @@ def main():
                                     print("clip found")
                                     temp_clips.append(clip)
                             except Exception as e:
-                                print(e)
+                                pass
 
-                            if prevPlayer == currPlayer:
+                            if prevPlayer == currPlayer and len(prevPlayer) >= 2:
                                 if currPlayer in nameRange:
                                     nameRange[currPlayer].append(frame_count)
                                 else:
                                     nameRange[currPlayer] = [frame_count]
                                 print(currPlayer)
-                                print(nameRange[currPlayer])
+                                print([nameRange[currPlayer][0], nameRange[currPlayer][-1]])
                             else:
                                 if clipFound:
                                     # determine proper duration
-                                    if len(nameRange[prevPlayer]) > 4:
-                                        clip_range = [nameRange[prevPlayer][0], nameRange[prevPlayer][-1]]
-                                        nameRange[prevPlayer] = []
-                                        print("taking temp clip out for release")
-                                        clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.id}?&start={clip_range[0]//60}&end={clip_range[1]//60}", "date": grab.date})
-
+                                    try:
+                                        if len(nameRange[prevPlayer]) > 4:
+                                            clip_range = [nameRange[prevPlayer][0], nameRange[prevPlayer][-1]]
+                                            print("taking temp clip out for release")
+                                            clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={clip_range[0]//60}&end={clip_range[1]//60}", "date": grab.getDate()})
+                                    except Exception as e:
+                                        pass
                                     temp_clips = []
                                     clipFound = False
+
+                                nameRange[prevPlayer] = []
 
                         else:
                             cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + intro_skip)

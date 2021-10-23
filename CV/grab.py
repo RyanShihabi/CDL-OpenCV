@@ -20,9 +20,15 @@ class Grab:
         print("setting id")
         self.id = id
 
+    def getId(self):
+        return self.id
+
     def setDate(self, date):
         print("setting date")
         self.date = date
+
+    def getDate(self):
+        return self.date
 
     # def setBounds(self, bounds):
     #     print("setting bounds")
