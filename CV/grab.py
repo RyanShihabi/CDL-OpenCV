@@ -35,9 +35,30 @@ class Grab:
     #     self.bounds = bounds
 
     def grabPlayer(self, frame) -> str:
-        player_roi = frame[940:990, 1355:1660]
+        player_roi = frame[940:995, 1355:1650]
 
-        text = pytesseract.image_to_string(player_roi, lang="eng", config="--psm 6 --oem 1").split("\n")[0]
+        gray = cv2.cvtColor(player_roi, cv2.COLOR_BGR2GRAY)
+
+        w_thresh = cv2.threshold(gray, 180, 255, cv2.THRESH_BINARY_INV)[1]
+        b_thresh = cv2.threshold(gray, 70, 255, cv2.THRESH_BINARY)[1]
+
+        (b, g, r) = player_roi[40, 80]
+        print(b)
+
+        cv2.imshow("w_banner", w_thresh)
+        cv2.imshow("b_banner", b_thresh)
+
+        cv2.waitKey(1)
+
+        w_text = pytesseract.image_to_string(w_thresh, lang="eng", config="--psm 6 --oem 1").split("\n")[0]
+        b_text = pytesseract.image_to_string(b_thresh, lang="eng", config="--psm 6 --oem 1").split("\n")[0]
+
+        text = w_text+b_text
+
+        if 200 <= b <= 255 and 200 <= g <= 255 and 200 <= r <= 255:
+            text = b_text
+
+        text = "".join(x for x in text if x.isalpha() or x == "6")
         # print(text)
         return text
 

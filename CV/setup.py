@@ -105,7 +105,7 @@ def main():
     # maps = []
     clips = {"Players": []}
     for video in videos:
-        if video[0] not in completed_videos:
+        if video[0][:-2] not in completed_videos:
             grab = Grab(video[1], video[2])
             # Trying 720p30 with no audio to see if performance increases format code 136
             # Feeds may need 1080: format code 299
@@ -192,18 +192,18 @@ def main():
                     prevPlayer = currPlayer
                 else:
                     if clipFound:
-                        if len(nameRange[prevPlayer]) > 4:
+                        if len(nameRange[prevPlayer]) > 2:
                             clip_range = [nameRange[prevPlayer][0], nameRange[prevPlayer][-1]]
                             nameRange[prevPlayer] = []
                             print("taking temp clip out for release")
-                            clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.id}?&start={clip_range[0]//60}&end={clip_range[1]//60}", "date": grab.date})
+                            clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.id}?&start={(clip_range[0]//60)+1}&end={(clip_range[1]//60)+2}", "date": grab.date})
 
                         temp_clips = []
                         clipFound = False
                     break
 
             with open("../data/processed/completed.txt", "a+") as f:
-                f.write(video[0])
+                f.write(video[0]+"\n")
             f.close()
 
             print("Finished video:", video[0])

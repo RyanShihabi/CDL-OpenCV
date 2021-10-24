@@ -1,4 +1,4 @@
-# coldb.from PIL import Image
+from PIL import Image
 import pytesseract
 import argparse
 import numpy as np
@@ -27,16 +27,37 @@ print((image.shape[1], image.shape[0]))
     # five players on feed
 
 if args["detection"] == "player":
-    player_roi = image[940:990, 1355:1660]
+    # player_roi = image[940:990, 1355:1650]
+    player_roi = image[935:995, 1355:1650]
 
-    # width = int(player_roi.shape[1] * 300 / 100)
-    # height = int(player_roi.shape[0] * 300 / 100)
-    #
-    # player_roi = cv2.resize(player_roi, (width, height), interpolation = cv2.INTER_AREA)
+    gray = cv2.cvtColor(player_roi, cv2.COLOR_BGR2GRAY)
+
+    # hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    # lower_black = np.array([0,0,0])
+    # upper_black = np.array([10,10,10])
+    # mask = cv2.inRange(hsv, lower_black, upper_black)
+    # res = cv2.bitwise_and(frame,frame, mask=mask)
+
+    w_thresh = cv2.threshold(gray, 200, 255, cv2.THRESH_BINARY_INV)[1]
+    b_thresh = cv2.threshold(gray, 50, 255, cv2.THRESH_BINARY)[1]
+
+    # thresh = cv2.threshold(gray, 30, 0, cv2.THRESH_BINARY_INV)[1]
 
     filename = f"{os.getpid()}.png"
-    cv2.imwrite(filename, player_roi)
-    cv2.imshow("Output", player_roi)
+    cv2.imwrite(filename, w_thresh)
+    cv2.imshow("Output", w_thresh)
+    cv2.imshow("Output", b_thresh)
+
+    w_text = pytesseract.image_to_string(w_thresh, lang="eng", config="--psm 6 --oem 1").split("\n")[0]
+    b_text = pytesseract.image_to_string(b_thresh, lang="eng", config="--psm 6 --oem 1").split("\n")[0]
+
+    text = w_text+b_text
+
+    text = "".join(x for x in text if x.isalpha() or x == "6")
+
+    print(text)
+    print(len(text))
+
 
 if args["detection"] == "map":
     #720p roi
@@ -129,9 +150,10 @@ print(text)
 cv2.waitKey(0)
 
 if args["detection"] == "player":
-    text = text.split("\n")
+    text = text.split("\n")[0]
+    text = "".join(x for x in text if x.isalpha() or x == "6")
     print(text)
-    print(len(text[0]))
+    print(len(text))
 
 if args["detection"] == "game":
     # modes = ["CONTROL", "HARDPOINT", "SEARCH & DESTROY", "SND"] #find other game modes, test mutltiple roi
