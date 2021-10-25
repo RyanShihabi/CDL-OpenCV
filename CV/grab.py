@@ -52,8 +52,8 @@ class Grab:
 
         # print(b)
 
-        cv2.imshow("w_banner", w_thresh)
-        cv2.imshow("b_banner", b_thresh)
+        # cv2.imshow("w_banner", w_thresh)
+        # cv2.imshow("b_banner", b_thresh)
 
         cv2.waitKey(1)
 
@@ -69,6 +69,8 @@ class Grab:
 
         if len(text) == 2 and text[-1] == "b":
             text = text.replace("b", "6")
+        elif len(text) == 4 and (text[:2] == "ol" or text[:2] == "oI"):
+            text = text.replace(text[:2], "SI")
 
         # print(text)
         return text
@@ -299,10 +301,13 @@ class Grab:
                 if line[0] in ['[', '(', '|', '{'] or line[4] in [']', ')', '|', '}']:
                     player = line.split(" ")[:2]
                     name = ""
-                    if "-" in player[1]:
-                        name = player[1].split("-")[0]
-                    else:
-                        name = player[1]
+
+                    if len(player) >= 2:
+                        name = "".join(x for x in player[1] if x.isalnum())
+                        # if "-" in player[1]:
+                        #     name = player[1].split("-")[0]
+                        # else:
+                        #     name = player[1]
                     players.append(f"{player[0]} {name}")
 
         print(players)
