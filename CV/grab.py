@@ -37,13 +37,20 @@ class Grab:
     def grabPlayer(self, frame) -> str:
         player_roi = frame[940:995, 1355:1650]
 
+        (b, g, r) = player_roi[40, 80]
+
+        player_roi = cv2.medianBlur(player_roi, 1)
+
         gray = cv2.cvtColor(player_roi, cv2.COLOR_BGR2GRAY)
 
-        w_thresh = cv2.threshold(gray, 180, 255, cv2.THRESH_BINARY_INV)[1]
-        b_thresh = cv2.threshold(gray, 70, 255, cv2.THRESH_BINARY)[1]
+        width = int(gray.shape[1] * 300 / 100)
+        height = int(gray.shape[0] * 200 / 100)
+        player_roi = cv2.resize(gray, (width, height), interpolation = cv2.INTER_AREA)
 
-        (b, g, r) = player_roi[40, 80]
-        print(b)
+        w_thresh = cv2.threshold(player_roi, 180, 255, cv2.THRESH_BINARY_INV)[1]
+        b_thresh = cv2.threshold(player_roi, 70, 255, cv2.THRESH_BINARY)[1]
+
+        # print(b)
 
         cv2.imshow("w_banner", w_thresh)
         cv2.imshow("b_banner", b_thresh)
@@ -59,6 +66,10 @@ class Grab:
             text = b_text
 
         text = "".join(x for x in text if x.isalpha() or x == "6")
+
+        if len(text) == 2 and text[-1] == "b":
+            text = text.replace("b", "6")
+
         # print(text)
         return text
 
@@ -287,7 +298,11 @@ class Grab:
             if len(line) > 4:
                 if line[0] in ['[', '(', '|', '{'] or line[4] in [']', ')', '|', '}']:
                     player = line.split(" ")[:2]
-                    name = player[1].split("-")[0]
+                    name = ""
+                    if "-" in player[1]:
+                        name = player[1].split("-")[0]
+                    else:
+                        name = player[1]
                     players.append(f"{player[0]} {name}")
 
         print(players)
