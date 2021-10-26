@@ -35,9 +35,10 @@ class Grab:
     #     self.bounds = bounds
 
     def grabPlayer(self, frame) -> str:
+        # [940:995, 1355:1650]
         player_roi = frame[940:995, 1355:1650]
 
-        (b, g, r) = player_roi[40, 80]
+        (b, g, r) = player_roi[40, 175]
 
         player_roi = cv2.medianBlur(player_roi, 1)
 
@@ -48,29 +49,47 @@ class Grab:
         player_roi = cv2.resize(gray, (width, height), interpolation = cv2.INTER_AREA)
 
         w_thresh = cv2.threshold(player_roi, 180, 255, cv2.THRESH_BINARY_INV)[1]
-        b_thresh = cv2.threshold(player_roi, 70, 255, cv2.THRESH_BINARY)[1]
+        b_thresh = cv2.threshold(player_roi, 60, 255, cv2.THRESH_BINARY)[1]
 
         # print(b)
 
-        # cv2.imshow("w_banner", w_thresh)
-        # cv2.imshow("b_banner", b_thresh)
+        cv2.imshow("w_banner", w_thresh)
+        cv2.imshow("b_banner", b_thresh)
 
         cv2.waitKey(1)
 
-        w_text = pytesseract.image_to_string(w_thresh, lang="eng", config="--psm 6 --oem 1").split("\n")[0]
-        b_text = pytesseract.image_to_string(b_thresh, lang="eng", config="--psm 6 --oem 1").split("\n")[0]
+        # w_text = pytesseract.image_to_string(w_thresh, lang="eng", config="--psm 6 --oem 1").split("\n")[0]
+        # b_text = pytesseract.image_to_string(b_thresh, lang="eng", config="--psm 6 --oem 1").split("\n")[0]
+        #
+        # if w_text == b_text:
+        #     text = w_text
+        # else:
+        #     text = w_text+b_text
 
-        text = w_text+b_text
+        data = [pytesseract.image_to_string(b_thresh, lang="eng", config="--psm 6 --oem 1").split("\n")[0].upper(), pytesseract.image_to_string(w_thresh, lang="eng", config="--psm 6 --oem 1").split("\n")[0].upper()]
+        # print(data)
+
+        # if len(data[0]) > len(data[1]):
+        #     text = data[0]
+        # else:
+        #     text = data[1]
 
         if 200 <= b <= 255 and 200 <= g <= 255 and 200 <= r <= 255:
-            text = b_text
+            text = data[0]
+            # text = pytesseract.image_to_string(b_thresh, lang="eng", config="--psm 6 --oem 1").split("\n")[0].upper()
+        else:
+            # text = pytesseract.image_to_string(w_thresh, lang="eng", config="--psm 6 --oem 1").split("\n")[0].upper()
+            if len(data[0]) > len(data[1]):
+                text = data[0]
+            else:
+                text = data[1]
 
         text = "".join(x for x in text if x.isalpha() or x == "6")
 
         if len(text) == 2 and text[-1] == "b":
             text = text.replace("b", "6")
-        elif len(text) == 4 and (text[:2] == "ol" or text[:2] == "oI"):
-            text = text.replace(text[:2], "SI")
+        elif len(text) > 2 and text[-2:].lower() == "mp":
+            text = "SIMP"
 
         # print(text)
         return text
@@ -304,10 +323,7 @@ class Grab:
 
                     if len(player) >= 2:
                         name = "".join(x for x in player[1] if x.isalnum())
-                        # if "-" in player[1]:
-                        #     name = player[1].split("-")[0]
-                        # else:
-                        #     name = player[1]
+
                     players.append(f"{player[0]} {name}")
 
         print(players)

@@ -133,38 +133,44 @@ def main():
                 # how will you figure out if you are inGame once a round is finished
                 if ret:
                     # inGame = grab.inGame(frame)
-                    # cv2.imshow("Frame", frame)
                     if (frame_count % 30 == 0) and (len(colors) > 0):
+                        # cv2.imshow("Frame", frame)
+                        # cv2.waitKey(1)
                         inGame = grab.inGame(frame)
                         if inGame:
                             currPlayer = grab.grabPlayer(frame)
+                            print(currPlayer)
 
-                            try:
-                                clip = grab.grabFeed(frame, frame_count, currPlayer)
-                                if clip != None:
-                                    clipFound = True
-                                    print("clip found")
-                                    temp_clips.append(clip)
-                            except Exception as e:
-                                pass
+                            clip = grab.grabFeed(frame, frame_count, currPlayer)
+                            if clip != None:
+                                clipFound = True
+                                print("clip found")
+                                temp_clips.append(clip)
 
                             if prevPlayer == currPlayer and len(prevPlayer) >= 2:
                                 if currPlayer in nameRange:
                                     nameRange[currPlayer].append(frame_count)
                                 else:
                                     nameRange[currPlayer] = [frame_count]
-                                print(currPlayer)
                                 print([nameRange[currPlayer][0], nameRange[currPlayer][-1]])
                             else:
                                 if clipFound:
+                                    print(nameRange[prevPlayer][-1] - temp_clips[0]["frame"])
+                                    if nameRange[prevPlayer][-1] - temp_clips[0]["frame"] >= 60:
                                     # determine proper duration
-                                    try:
-                                        if len(nameRange[prevPlayer]) > 4:
-                                            clip_range = [nameRange[prevPlayer][0], nameRange[prevPlayer][-1]]
-                                            print("taking temp clip out for release")
-                                            clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={clip_range[0]//60}&end={clip_range[1]//60}", "date": grab.getDate()})
-                                    except Exception as e:
-                                        pass
+                                        try:
+                                            if len(nameRange[prevPlayer]) > 4:
+                                                clip_range = [nameRange[prevPlayer][0], nameRange[prevPlayer][-1]]
+                                                player = temp_clips[0]["player"]
+                                                print(f"taking {player} temp clip out for release")
+                                                clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={clip_range[0]//60}&end={clip_range[1]//60}", "date": grab.getDate()})
+                                        except Exception as e:
+                                            print(e)
+                                    else:
+                                        clip_range = [nameRange[prevPlayer][0], nameRange[prevPlayer][-1]]
+                                        print("taking temp clip out for release")
+                                        clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={(clip_range[0]-60)//60}&end={(clip_range[1]+60)//60}", "date": grab.getDate()})
+
                                     temp_clips = []
                                     clipFound = False
 
@@ -192,14 +198,18 @@ def main():
                     prevPlayer = currPlayer
                 else:
                     if clipFound:
-                        if len(nameRange[prevPlayer]) > 2:
-                            clip_range = [nameRange[prevPlayer][0], nameRange[prevPlayer][-1]]
-                            nameRange[prevPlayer] = []
-                            print("taking temp clip out for release")
-                            clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.id}?&start={(clip_range[0]//60)+1}&end={(clip_range[1]//60)+2}", "date": grab.date})
+                        print(nameRange[prevPlayer][-1] - temp_clips[0]["frame"])
+                        if nameRange[prevPlayer][-1] - temp_clips[0]["frame"] >= 60:
 
-                        temp_clips = []
-                        clipFound = False
+                            if len(nameRange[prevPlayer]) > 4:
+                                clip_range = [nameRange[prevPlayer][0], nameRange[prevPlayer][-1]]
+                                nameRange[prevPlayer] = []
+                                player = temp_clips[0]["player"]
+                                print(f"taking {player} temp clip out for release")
+                                clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={(clip_range[0]//60)}&end={(clip_range[1]//60)}", "date": grab.getDate()})
+
+                            temp_clips = []
+                            clipFound = False
                     break
 
             with open("../data/processed/completed.txt", "a+") as f:

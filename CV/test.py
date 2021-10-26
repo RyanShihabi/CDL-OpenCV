@@ -32,28 +32,33 @@ if args["detection"] == "player":
 
     gray = cv2.cvtColor(player_roi, cv2.COLOR_BGR2GRAY)
 
+    ret, thresh = cv2.threshold(gray, 70, 255, cv2.THRESH_BINARY)
+    adapt = cv2.adaptiveThreshold(gray,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY,99,3)
+
     # hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     # lower_black = np.array([0,0,0])
     # upper_black = np.array([10,10,10])
     # mask = cv2.inRange(hsv, lower_black, upper_black)
     # res = cv2.bitwise_and(frame,frame, mask=mask)
 
-    w_thresh = cv2.threshold(gray, 200, 255, cv2.THRESH_BINARY_INV)[1]
-    b_thresh = cv2.threshold(gray, 50, 255, cv2.THRESH_BINARY)[1]
+    # w_thresh = cv2.threshold(gray, 200, 255, cv2.THRESH_BINARY_INV)[1]
+    # b_thresh = cv2.threshold(gray, 50, 255, cv2.THRESH_BINARY)[1]
 
     # thresh = cv2.threshold(gray, 30, 0, cv2.THRESH_BINARY_INV)[1]
 
     filename = f"{os.getpid()}.png"
-    cv2.imwrite(filename, w_thresh)
-    cv2.imshow("Output", w_thresh)
-    cv2.imshow("Output", b_thresh)
+    cv2.imwrite(filename, adapt)
+    cv2.imshow("Output", adapt)
+    # cv2.imshow("Output", w_thresh)
+    # cv2.imshow("Output", b_thresh)
 
-    w_text = pytesseract.image_to_string(w_thresh, lang="eng", config="--psm 6 --oem 1").split("\n")[0]
-    b_text = pytesseract.image_to_string(b_thresh, lang="eng", config="--psm 6 --oem 1").split("\n")[0]
+    # w_text = pytesseract.image_to_string(w_thresh, lang="eng", config="--psm 6 --oem 1").split("\n")[0]
+    # b_text = pytesseract.image_to_string(b_thresh, lang="eng", config="--psm 6 --oem 1").split("\n")[0]
+    text = pytesseract.image_to_string(adapt, lang="eng", config="--psm 6 --oem 1").split("\n")[0]
 
-    text = w_text+b_text
+    # text = w_text+b_text
 
-    text = "".join(x for x in text if x.isalpha() or x == "6")
+    # text = "".join(x for x in text if x.isalpha() or x == "6")
 
     print(text)
     print(len(text))
