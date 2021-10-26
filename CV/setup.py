@@ -128,7 +128,6 @@ def main():
 
             while cap.isOpened():
                 ret, frame = cap.read()
-
                 # only grab feed if team colors are initiated
                 # how will you figure out if you are inGame once a round is finished
                 if ret:
@@ -137,10 +136,8 @@ def main():
                         # cv2.imshow("Frame", frame)
                         # cv2.waitKey(1)
                         inGame = grab.inGame(frame)
+                        currPlayer = grab.grabPlayer(frame)
                         if inGame:
-                            currPlayer = grab.grabPlayer(frame)
-                            print(currPlayer)
-
                             clip = grab.grabFeed(frame, frame_count, currPlayer)
                             if clip != None:
                                 clipFound = True
@@ -155,22 +152,23 @@ def main():
                                 print([nameRange[currPlayer][0], nameRange[currPlayer][-1]])
                             else:
                                 if clipFound:
-                                    print(nameRange[prevPlayer][-1] - temp_clips[0]["frame"])
-                                    if nameRange[prevPlayer][-1] - temp_clips[0]["frame"] >= 60:
-                                    # determine proper duration
-                                        try:
-                                            if len(nameRange[prevPlayer]) > 4:
-                                                clip_range = [nameRange[prevPlayer][0], nameRange[prevPlayer][-1]]
-                                                player = temp_clips[0]["player"]
-                                                print(f"taking {player} temp clip out for release")
-                                                clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={clip_range[0]//60}&end={clip_range[1]//60}", "date": grab.getDate()})
-                                        except Exception as e:
-                                            print(e)
-                                    else:
-                                        clip_range = [nameRange[prevPlayer][0], nameRange[prevPlayer][-1]]
-                                        print("taking temp clip out for release")
-                                        clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={(clip_range[0]-60)//60}&end={(clip_range[1]+60)//60}", "date": grab.getDate()})
-
+                                    try:
+                                        print(nameRange[prevPlayer][-1] - temp_clips[0]["frame"])
+                                        if nameRange[prevPlayer][-1] - temp_clips[-1]["frame"] >= 60 and temp_clips[0]["frame"] - nameRange[prevPlayer][0] >= 60:
+                                        # determine proper duration
+                                                if len(nameRange[prevPlayer]) > 4:
+                                                    clip_range = [nameRange[prevPlayer][0], nameRange[prevPlayer][-1]]
+                                                    player = temp_clips[0]["player"]
+                                                    print(f"taking {player} temp clip out for release")
+                                                    clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={clip_range[0]//60}&end={clip_range[1]//60}", "date": grab.getDate()})
+                                        else:
+                                            clip_range = [nameRange[prevPlayer][0], nameRange[prevPlayer][-1]]
+                                            player = temp_clips[0]["player"]
+                                            print(f"taking {player} temp clip out for release")
+                                            clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={(clip_range[0]-120)//60}&end={(clip_range[1]+120)//60}", "date": grab.getDate()})
+                                    except Exception as e:
+                                        print(e)
+                                        print(len(temp_clips))
                                     temp_clips = []
                                     clipFound = False
 
@@ -198,18 +196,24 @@ def main():
                     prevPlayer = currPlayer
                 else:
                     if clipFound:
-                        print(nameRange[prevPlayer][-1] - temp_clips[0]["frame"])
-                        if nameRange[prevPlayer][-1] - temp_clips[0]["frame"] >= 60:
-
-                            if len(nameRange[prevPlayer]) > 4:
+                        try:
+                            print(nameRange[prevPlayer][-1] - temp_clips[0]["frame"])
+                            if nameRange[prevPlayer][-1] - temp_clips[-1]["frame"] >= 60 and temp_clips[0]["frame"] - nameRange[prevPlayer][0] >= 60:
+                            # determine proper duration
+                                    if len(nameRange[prevPlayer]) > 4:
+                                        clip_range = [nameRange[prevPlayer][0], nameRange[prevPlayer][-1]]
+                                        player = temp_clips[0]["player"]
+                                        print(f"taking {player} temp clip out for release")
+                                        clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={clip_range[0]//60}&end={clip_range[1]//60}", "date": grab.getDate()})
+                            else:
                                 clip_range = [nameRange[prevPlayer][0], nameRange[prevPlayer][-1]]
-                                nameRange[prevPlayer] = []
                                 player = temp_clips[0]["player"]
                                 print(f"taking {player} temp clip out for release")
-                                clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={(clip_range[0]//60)}&end={(clip_range[1]//60)}", "date": grab.getDate()})
-
-                            temp_clips = []
-                            clipFound = False
+                                clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={(clip_range[0]-120)//60}&end={(clip_range[1]+120)//60}", "date": grab.getDate()})
+                        except Exception as e:
+                            print(e)
+                        temp_clips = []
+                        clipFound = False
                     break
 
             with open("../data/processed/completed.txt", "a+") as f:
@@ -219,12 +223,15 @@ def main():
             print("Finished video:", video[0])
             print(clips)
 
-            for clip in clips["Players"]:
-                if playerCol.find_one({"player": clip["player"]}) == None:
+            for clip in clips['Players']:
+                # print(playerCol.find_one({"player": clip["player"]}))
+                # print(clip["player"])
+                player = clip["player"].split()
+                if playerCol.find_one({"player": player[1]}) == None:
                     print("creating a new document")
                     playerCol.insert_one({
-                        "player": clip["player"].split()[1],
-                        "team": clip["player"].split()[0],
+                        "player": player[1],
+                        "team": player[0],
                         "clips": [{
                             "url": clip["clip_url"],
                             "date": clip["date"],
@@ -233,7 +240,7 @@ def main():
                 else:
                     print("appending clip to existing document")
                     playerCol.update_one(
-                        {"player": clip["player"]},
+                        {"player": player[1]},
                         {
                             "$push":
                             {

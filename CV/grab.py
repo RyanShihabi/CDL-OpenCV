@@ -53,10 +53,10 @@ class Grab:
 
         # print(b)
 
-        cv2.imshow("w_banner", w_thresh)
-        cv2.imshow("b_banner", b_thresh)
+        # cv2.imshow("w_banner", w_thresh)
+        # cv2.imshow("b_banner", b_thresh)
 
-        cv2.waitKey(1)
+        # cv2.waitKey(1)
 
         # w_text = pytesseract.image_to_string(w_thresh, lang="eng", config="--psm 6 --oem 1").split("\n")[0]
         # b_text = pytesseract.image_to_string(b_thresh, lang="eng", config="--psm 6 --oem 1").split("\n")[0]
