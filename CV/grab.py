@@ -88,7 +88,7 @@ class Grab:
 
         if len(text) == 2 and text[-1] == "b":
             text = text.replace("b", "6")
-        elif len(text) > 2 and text[-2:].lower() == "mp":
+        elif len(text) > 3 and (text[-2:].lower() == "mp" or text[-3:].lower() == "mip"):
             text = "SIMP"
 
         # print(text)

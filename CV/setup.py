@@ -137,8 +137,10 @@ def main():
                         # cv2.imshow("Frame", frame)
                         # cv2.waitKey(1)
                         inGame = grab.inGame(frame)
-                        currPlayer = grab.grabPlayer(frame)
                         if inGame:
+                            currPlayer = grab.grabPlayer(frame)
+                            print(currPlayer)
+
                             clip = grab.grabFeed(frame, frame_count, currPlayer)
                             if clip != None:
                                 clipFound = True
@@ -154,15 +156,22 @@ def main():
                             else:
                                 if clipFound:
                                     try:
-                                        print(nameRange[prevPlayer][-1] - temp_clips[0]["frame"])
-                                        clip_range = [nameRange[prevPlayer][0], nameRange[prevPlayer][-1]]
+                                        print(nameRange[prevPlayer][-1] - temp_clips[-1]["frame"], temp_clips[0]["frame"] - nameRange[prevPlayer][0])
                                         player = temp_clips[0]["player"]
-                                        print(f"taking {player} temp clip out for release")
-                                        if nameRange[prevPlayer][-1] - temp_clips[-1]["frame"] >= 120 and temp_clips[0]["frame"] - nameRange[prevPlayer][0] >= 120:
+                                        # print(f"taking {player} temp clip out for release")
+                                        if nameRange[prevPlayer][-1] - temp_clips[-1]["frame"] <= 120:
                                         # determine proper duration
-                                            clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={clip_range[0]//60}&end={clip_range[1]//60}", "date": grab.getDate()})
+                                        # change condition to allow longer clips, rather just trim them down
+                                            print("clip duration checked")
+                                            print(f"taking {player} temp clip out for release")
+                                            clips["Players"].append({"player": player, "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={(temp_clips[0]['frame']-60)//60}&end={(temp_clips[-1]['frame']+60)//60}", "date": grab.getDate()})
                                         else:
-                                            clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={(clip_range[0]-120)//60}&end={(clip_range[1]+120)//60}", "date": grab.getDate()})
+                                            print("trimming clip")
+                                            print(f"taking {player} temp clip out for release")
+                                            clips["Players"].append({"player": player, "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={(temp_clips[0]['frame']-120)//60}&end={(temp_clips[-1]['frame']+120)//60}", "date": grab.getDate()})
+                                        # else:
+                                        #     print("clip is short")
+                                        #     clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={(temp_clips[0]['frame']-120)//60}&end={(temp_clips[-1]['frame']+120)//60}", "date": grab.getDate()})
                                     except Exception as e:
                                         print(e)
                                         print(len(temp_clips))
