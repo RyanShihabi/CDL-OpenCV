@@ -164,11 +164,11 @@ def main():
                                         # change condition to allow longer clips, rather just trim them down
                                             print("clip duration checked")
                                             print(f"taking {player} temp clip out for release")
-                                            clips["Players"].append({"player": player, "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={(temp_clips[0]['frame']-60)//60}&end={(temp_clips[-1]['frame']+60)//60}", "date": grab.getDate()})
+                                            clips["Players"].append({"player": player, "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={(nameRange[prevPlayer][0]-60)//60}&end={(temp_clips[-1]['frame']+120)//60}", "date": grab.getDate()})
                                         else:
                                             print("trimming clip")
                                             print(f"taking {player} temp clip out for release")
-                                            clips["Players"].append({"player": player, "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={(temp_clips[0]['frame']-120)//60}&end={(temp_clips[-1]['frame']+120)//60}", "date": grab.getDate()})
+                                            clips["Players"].append({"player": player, "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={(nameRange[prevPlayer][0]-60)//60}&end={(temp_clips[-1]['frame']-120)//60}", "date": grab.getDate()})
                                         # else:
                                         #     print("clip is short")
                                         #     clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={(temp_clips[0]['frame']-120)//60}&end={(temp_clips[-1]['frame']+120)//60}", "date": grab.getDate()})
