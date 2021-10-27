@@ -128,6 +128,7 @@ def main():
 
             while cap.isOpened():
                 ret, frame = cap.read()
+
                 # only grab feed if team colors are initiated
                 # how will you figure out if you are inGame once a round is finished
                 if ret:
@@ -154,17 +155,13 @@ def main():
                                 if clipFound:
                                     try:
                                         print(nameRange[prevPlayer][-1] - temp_clips[0]["frame"])
-                                        if nameRange[prevPlayer][-1] - temp_clips[-1]["frame"] >= 60 and temp_clips[0]["frame"] - nameRange[prevPlayer][0] >= 60:
+                                        clip_range = [nameRange[prevPlayer][0], nameRange[prevPlayer][-1]]
+                                        player = temp_clips[0]["player"]
+                                        print(f"taking {player} temp clip out for release")
+                                        if nameRange[prevPlayer][-1] - temp_clips[-1]["frame"] >= 120 and temp_clips[0]["frame"] - nameRange[prevPlayer][0] >= 120:
                                         # determine proper duration
-                                                if len(nameRange[prevPlayer]) > 4:
-                                                    clip_range = [nameRange[prevPlayer][0], nameRange[prevPlayer][-1]]
-                                                    player = temp_clips[0]["player"]
-                                                    print(f"taking {player} temp clip out for release")
-                                                    clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={clip_range[0]//60}&end={clip_range[1]//60}", "date": grab.getDate()})
+                                            clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={clip_range[0]//60}&end={clip_range[1]//60}", "date": grab.getDate()})
                                         else:
-                                            clip_range = [nameRange[prevPlayer][0], nameRange[prevPlayer][-1]]
-                                            player = temp_clips[0]["player"]
-                                            print(f"taking {player} temp clip out for release")
                                             clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={(clip_range[0]-120)//60}&end={(clip_range[1]+120)//60}", "date": grab.getDate()})
                                     except Exception as e:
                                         print(e)
@@ -195,25 +192,24 @@ def main():
                     frame_count += 1
                     prevPlayer = currPlayer
                 else:
-                    if clipFound:
-                        try:
-                            print(nameRange[prevPlayer][-1] - temp_clips[0]["frame"])
-                            if nameRange[prevPlayer][-1] - temp_clips[-1]["frame"] >= 60 and temp_clips[0]["frame"] - nameRange[prevPlayer][0] >= 60:
-                            # determine proper duration
-                                    if len(nameRange[prevPlayer]) > 4:
-                                        clip_range = [nameRange[prevPlayer][0], nameRange[prevPlayer][-1]]
-                                        player = temp_clips[0]["player"]
-                                        print(f"taking {player} temp clip out for release")
-                                        clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={clip_range[0]//60}&end={clip_range[1]//60}", "date": grab.getDate()})
-                            else:
-                                clip_range = [nameRange[prevPlayer][0], nameRange[prevPlayer][-1]]
-                                player = temp_clips[0]["player"]
-                                print(f"taking {player} temp clip out for release")
-                                clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={(clip_range[0]-120)//60}&end={(clip_range[1]+120)//60}", "date": grab.getDate()})
-                        except Exception as e:
-                            print(e)
-                        temp_clips = []
-                        clipFound = False
+                    # if clipFound:
+                    #     try:
+                    #         print(nameRange[prevPlayer][-1] - temp_clips[0]["frame"])
+                    #         if nameRange[prevPlayer][-1] - temp_clips[-1]["frame"] >= 60 and temp_clips[0]["frame"] - nameRange[prevPlayer][0] >= 60:
+                    #         # determine proper duration
+                    #             clip_range = [nameRange[prevPlayer][0], nameRange[prevPlayer][-1]]
+                    #             player = temp_clips[0]["player"]
+                    #             print(f"taking {player} temp clip out for release")
+                    #             clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={clip_range[0]//60}&end={clip_range[1]//60}", "date": grab.getDate()})
+                    #         else:
+                    #             clip_range = [nameRange[prevPlayer][0], nameRange[prevPlayer][-1]]
+                    #             player = temp_clips[0]["player"]
+                    #             print(f"taking {player} temp clip out for release")
+                    #             clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={(clip_range[0]-120)//60}&end={(clip_range[1]+120)//60}", "date": grab.getDate()})
+                    #     except Exception as e:
+                    #         print(e)
+                    #     temp_clips = []
+                    #     clipFound = False
                     break
 
             with open("../data/processed/completed.txt", "a+") as f:
