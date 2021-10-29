@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 const app = express();
 
-mongoose.connect('mongodb://localhost/CDL');
+mongoose.connect('mongodb+srv://admin:7pPNMQZHfblHXlUg@cdlcluster.shvz6.mongodb.net/CDL?retryWrites=true&w=majority');
 mongoose.Promise = global.Promise;
 
 app.use(express.static('public'));

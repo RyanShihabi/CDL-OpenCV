@@ -117,7 +117,8 @@ def main():
 
             cap = cv2.VideoCapture(f"videos/{video[0]}.mp4")
             cap.set(cv2.CAP_PROP_POS_FRAMES, 24000)
-            frame_count = 24000
+            # print("Starting at:", int(cap.get(cv2.CAP_PROP_POS_FRAMES)))
+            # frame_count = 24000
             prevPlayer = None
             currPlayer = None
             nameRange = {}
@@ -128,6 +129,8 @@ def main():
 
             while cap.isOpened():
                 ret, frame = cap.read()
+
+                frame_count = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
 
                 # only grab feed if team colors are initiated
                 # how will you figure out if you are inGame once a round is finished
@@ -146,7 +149,8 @@ def main():
                             #     print("clip found")
                             #     temp_clips.append(clip)
 
-                            if prevPlayer == currPlayer and len(prevPlayer) >= 2:
+                            if prevPlayer == currPlayer:
+                                # print(frame_count)
                                 clip = grab.grabFeed(frame, frame_count, currPlayer)
                                 if clip != None:
                                     clipFound = True
@@ -163,41 +167,26 @@ def main():
                                     try:
                                         print(temp_clips[0]["frame"] - nameRange[prevPlayer][0], nameRange[prevPlayer][-1] - temp_clips[-1]["frame"])
                                         player = temp_clips[0]["player"]
-                                        # print(f"taking {player} temp clip out for release")
-                                        # if nameRange[prevPlayer][-1] - temp_clips[-1]["frame"] <= 120:
-                                        # determine proper duration
-                                        # change condition to allow longer clips, rather just trim them down
-                                            # print("clip duration checked")
                                         print(f"taking {player} temp clip out for release")
-                                        if (((temp_clips[-1]['frame']+120)//60) - ((temp_clips[0]['frame']-120)//60)) > 4:
-                                            clips["Players"].append({"player": player, "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={(nameRange[prevPlayer][0]-120)//60}&end={(temp_clips[-1]['frame']+120)//60}", "date": grab.getDate()})
+                                        if (int((temp_clips[-1]['frame']+120)//59.94) - int((temp_clips[0]['frame']-120)//59.94)) > 3:
+                                            clips["Players"].append({"player": player, "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={int((nameRange[prevPlayer][0]-120)//59.94)}&end={int((temp_clips[-1]['frame']+120)//59.94)}", "date": grab.getDate()})
+                                            # clips["Players"].append({"player": player, "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={(temp_clips[0]['frame']-300)//60}&end={(nameRange[prevPlayer][-1]+120)//60}", "date": grab.getDate()})
+                                            # clips["Players"].append({"player": player, "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={(nameRange[prevPlayer][0]-120)//60}&end={(nameRange[prevPlayer][-1]+120)//60}", "date": grab.getDate()})
                                         else:
                                             print("clip too short")
-                                        # clips["Players"].append({"player": player, "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={(temp_clips[0]['frame']-120)//60}&end={(temp_clips[-1]['frame']+60)//60}", "date": grab.getDate()})
                                         print(clips["Players"])
-                                        # else:
-                                        #     print("trimming clip")
-                                        #     print(f"taking {player} temp clip out for release")
-                                        #     clips["Players"].append({"player": player, "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={(nameRange[prevPlayer][0]-60)//60}&end={(temp_clips[-1]['frame']+120)//60}", "date": grab.getDate()})
-                                        # else:
-                                        #     print("clip is short")
-                                        #     clips["Players"].append({"player": temp_clips[0]["player"], "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={(temp_clips[0]['frame']-120)//60}&end={(temp_clips[-1]['frame']+120)//60}", "date": grab.getDate()})
                                     except Exception as e:
                                         print(e)
-                                        print(len(temp_clips))
+                                        print(currPlayer)
+                                        print(temp_clips)
                                     temp_clips = []
                                     clipFound = False
 
                                 nameRange[prevPlayer] = []
-
-                            # if clip != None:
-                            #     clipFound = True
-                            #     print("clip found")
-                            #     temp_clips.append(clip)
-
+                                prevPlayer = currPlayer
                         else:
+                            # print("not in game")
                             cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + intro_skip)
-                            frame_count += intro_skip
                             continue
                     else:
                         if len(colors) == 0:
@@ -208,13 +197,11 @@ def main():
                                 print("Found colors: ", colors)
                                 grab.setBounds(colors)
                             else:
-                                # print("fast-forwarding to color: ", frame_count)
                                 cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + intro_skip)
-                                frame_count += intro_skip
                                 continue
 
-                    frame_count += 1
-                    prevPlayer = currPlayer
+                    # frame_count += 1
+                    # prevPlayer = currPlayer
                 else:
                     break
 

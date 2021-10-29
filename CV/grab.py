@@ -107,7 +107,7 @@ class Grab:
 
 
     def secondOfFrame(self, frame) -> int:
-        return frame // 60
+        return int(frame // 59.94)
 
     def grabTeams(self, title) -> list:
     # "Champs Final | @Toronto Ultra vs @Atlanta FaZe | Championship Weekend | Day 4"
