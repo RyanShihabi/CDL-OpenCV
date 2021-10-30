@@ -329,7 +329,7 @@ class Grab:
         print(players)
         player = self.isClip(players)
 
-        if player != None and camera.lower() == player[6:].lower():
+        if player != None and camera.lower() == player.split()[1].lower():
             second = self.secondOfFrame(fts)
             print(f"clip found for {player} at {second}")
             # keep clan name?

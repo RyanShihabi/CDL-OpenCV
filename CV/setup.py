@@ -105,7 +105,7 @@ def main():
     # maps = []
     clips = {"Players": []}
     for video in videos:
-        if video[0][:-2] not in completed_videos:
+        if video[0] not in completed_videos:
             grab = Grab(video[1], video[2])
             # Trying 720p30 with no audio to see if performance increases format code 136
             # Feeds may need 1080: format code 299
@@ -170,8 +170,7 @@ def main():
                                         print(f"taking {player} temp clip out for release")
                                         if (int((temp_clips[-1]['frame']+120)//59.94) - int((temp_clips[0]['frame']-120)//59.94)) > 3:
                                             clips["Players"].append({"player": player, "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={int((nameRange[prevPlayer][0]-120)//59.94)}&end={int((temp_clips[-1]['frame']+120)//59.94)}", "date": grab.getDate()})
-                                            # clips["Players"].append({"player": player, "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={(temp_clips[0]['frame']-300)//60}&end={(nameRange[prevPlayer][-1]+120)//60}", "date": grab.getDate()})
-                                            # clips["Players"].append({"player": player, "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={(nameRange[prevPlayer][0]-120)//60}&end={(nameRange[prevPlayer][-1]+120)//60}", "date": grab.getDate()})
+                                            # clips["Players"].append({"player": player, "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={int((temp_clips[0]-120)//59.94)}&end={int((temp_clips[-1]+120)//59.94)}", "date": grab.getDate()})
                                         else:
                                             print("clip too short")
                                         print(clips["Players"])
