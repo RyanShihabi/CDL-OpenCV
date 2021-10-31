@@ -86,21 +86,21 @@ class Grab:
 
         text = "".join(x for x in text if x.isalpha() or x == "6")
 
-        if len(text) == 2 and text[-1] == "b":
-            text = text.replace("b", "6")
+        if len(text) == 2 and (text[-1] == "b" or text[-1] == "B"):
+            text = text.replace(text[-1], "6")
         elif len(text) > 3 and (text[-2:].lower() == "mp" or text[-3:].lower() == "mip"):
             text = "SIMP"
 
         # print(text)
         return text
 
-    def isClip(self, players) -> list:
+    def isClip(self, players, camera) -> list:
         if len(players) < 2:
             return None
 
         for i in range(0, len(players)):
             for j in range(i+1, len(players)):
-                if players[i][6:].lower() == players[j][6:].lower():
+                if (camera.lower() in players[i].lower()) and (camera.lower() in players[j].lower()):
                     return players[i]
 
         return None
@@ -327,16 +327,22 @@ class Grab:
                     players.append(f"{player[0]} {name}")
 
         print(players)
-        player = self.isClip(players)
+        player = self.isClip(players, camera)
 
-        if player != None and camera.lower() == player.split()[1].lower():
-            second = self.secondOfFrame(fts)
-            print(f"clip found for {player} at {second}")
-            # keep clan name?
-            # "https://www.youtube.com/embed/OTsYiHhrDPw?&start=692&end=702"
+        if player and "C6" in player.split()[1][:2]:
+            player = "[DAL] C6"
 
-            # return {"player": player, "clip_url": f"https://www.youtube.com/embed/{self.id}?&start={second-8}&end={second+8}", "date": self.date}
-            return {"player": player, "frame": fts}
-            # Dont need to check if second is less than 5, wont happen games dont start until later
+        try:
+            if player != None:
+                second = self.secondOfFrame(fts)
+                print(f"clip found for {player} at {second}")
+                # keep clan name?
+                # "https://www.youtube.com/embed/OTsYiHhrDPw?&start=692&end=702"
 
-        return None
+                # return {"player": player, "clip_url": f"https://www.youtube.com/embed/{self.id}?&start={second-8}&end={second+8}", "date": self.date}
+                return {"player": player, "frame": fts}
+                # Dont need to check if second is less than 5, wont happen games dont start until later
+
+            return None
+        except Exception:
+            return None
