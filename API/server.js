@@ -1,29 +1,62 @@
-require("dotenv").config({ path: "./config.env" });
-
+const queryString = require("query-string");
+const body_parser = require("body-parser");
 const express = require("express");
-const cors = require("cors");
+const url = require("url");
+const server = express();
 
-const dbo = require("./db/conn");
+server.use(body_parser.json());
 
-const PORT = process.env.PORT || 3000;
-const app = express();
+const port = 3000;
 
-app.use(cors());
-app.use(express.json());
-app.use(require("./routes/record"));
+const db = require("./db");
+const dbName = "CDL";
+const collectionName = "Players";
 
-app.use(function (err, _req, res) {
-  console.error(err.stack);
-  res.status(500).send('Something broke!');
+db.initialize(dbName, collectionName, function (dbCollection) { // successCallback
+   // get all items
+   dbCollection.find().toArray(function (err, result) {
+      if (err) throw err;
+      console.log(result);
+
+      // << return response to client >>
+   });
+
+   // server.get("/players", (req, res) => {
+   //    // return updated list
+   //    dbCollection.find().toArray((error, result) => {
+   //       if (error) throw error;
+   //       res.json(result);
+   //    });
+   // });
+
+   server.get("/players", (req, res) => {
+     let name = req.query.name;
+     let team = req.query.team;
+
+     if(name && team == undefined){
+       dbCollection.findOne({ player: name }, (error, result) => {
+         console.log()
+         if(error) throw error;
+         res.json(result);
+       });
+     } else if(team && name == undefined) {
+       dbCollection.find({ team: `[${team}]` }).toArray((error, result) => {
+         if(error) throw error;
+         res.json(result);
+       });
+     }
+     else{
+       dbCollection.find().toArray((error, result) => {
+         if(error) throw error;
+         res.json(result);
+       });
+     }
+   });
+
+}, function (err) { // failureCallback
+   throw (err);
 });
 
-dbo.connectToServer(function (err) {
-  if (err) {
-    console.error(err);
-    process.exit();
-  }
-
-  app.listen(PORT, () => {
-    console.log(`Server is running on port: ${PORT}`);
-  });
+server.listen(port, () => {
+   console.log(`Server listening at ${port}`);
 });

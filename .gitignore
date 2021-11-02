@@ -15,4 +15,4 @@ mongodbtest.py
 setupTest.py
 feedTest.py
 clipLogic.py
-config.env
+.env
