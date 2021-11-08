@@ -15,4 +15,6 @@ mongodbtest.py
 setupTest.py
 feedTest.py
 clipLogic.py
+demo.py
 .env
+gunTemplate.py
