@@ -71,6 +71,7 @@ def grabTeams(self, title) -> list:
     return [teams[0][:-4], teams[1][:-1]]
 
 def main():
+    # process rest of playlist
     playlist = "PLisfUdjySbZVoTRbAlfObs8dI-cb-gWk-"
     colors = []
     inGame = False
@@ -107,18 +108,12 @@ def main():
     for video in videos:
         if video[0] not in completed_videos:
             grab = Grab(video[1], video[2])
-            # Trying 720p30 with no audio to see if performance increases format code 136
-            # Feeds may need 1080: format code 299
-            # figure out option commands for format and no audio
+
             if path.isfile(f"videos/{video[0]}.mp4") == False:
                 os.system(f"yt-dlp -f 299 {video[1]} -o '~/Desktop/CS/CDL OpenCV/CV/videos/{video[0]}.mp4'")
-            # Implement time extraction
-            # Make sure the download is cancelled if not completed
 
             cap = cv2.VideoCapture(f"videos/{video[0]}.mp4")
             cap.set(cv2.CAP_PROP_POS_FRAMES, 24000)
-            # print("Starting at:", int(cap.get(cv2.CAP_PROP_POS_FRAMES)))
-            # frame_count = 24000
             prevPlayer = None
             currPlayer = None
             nameRange = {}
@@ -135,22 +130,13 @@ def main():
                 # only grab feed if team colors are initiated
                 # how will you figure out if you are inGame once a round is finished
                 if ret:
-                    # inGame = grab.inGame(frame)
                     if (frame_count % 60 == 0) and (len(colors) > 0):
-                        # cv2.imshow("Frame", frame)
-                        # cv2.waitKey(1)
                         inGame = grab.inGame(frame)
                         currPlayer = grab.grabPlayer(frame)
                         print(currPlayer)
                         if inGame:
-                            # clip = grab.grabFeed(frame, frame_count, currPlayer)
-                            # if clip != None:
-                            #     clipFound = True
-                            #     print("clip found")
-                            #     temp_clips.append(clip)
 
                             if prevPlayer == currPlayer:
-                                # print(frame_count)
                                 clip = grab.grabFeed(frame, frame_count, currPlayer)
                                 if clip != None:
                                     clipFound = True
@@ -170,7 +156,6 @@ def main():
                                         print(f"taking {player} temp clip out for release")
                                         if (int((temp_clips[-1]['frame']+120)//59.94) - int((temp_clips[0]['frame']-120)//59.94)) > 3:
                                             clips["Players"].append({"player": player, "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={int((nameRange[prevPlayer][0]-120)//59.94)}&end={int((temp_clips[-1]['frame']+120)//59.94)}", "date": grab.getDate()})
-                                            # clips["Players"].append({"player": player, "clip_url": f"https://www.youtube.com/embed/{grab.getId()}?&start={int((temp_clips[0]-120)//59.94)}&end={int((temp_clips[-1]+120)//59.94)}", "date": grab.getDate()})
                                         else:
                                             print("clip too short")
                                         print(clips["Players"])
@@ -184,13 +169,11 @@ def main():
                                 nameRange[prevPlayer] = []
                                 prevPlayer = currPlayer
                         else:
-                            # print("not in game")
                             cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + intro_skip)
                             continue
                     else:
                         if len(colors) == 0:
                             inGame = grab.inGame(frame)
-                            # print(inGame)
                             if inGame:
                                 colors = grabTeamColors(frame)
                                 print("Found colors: ", colors)
@@ -199,8 +182,6 @@ def main():
                                 cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + intro_skip)
                                 continue
 
-                    # frame_count += 1
-                    # prevPlayer = currPlayer
                 else:
                     break
 
@@ -212,8 +193,6 @@ def main():
             print(clips)
 
             for clip in clips['Players']:
-                # print(playerCol.find_one({"player": clip["player"]}))
-                # print(clip["player"])
                 player = clip["player"].split()
                 if playerCol.find_one({"player": player[1]}) == None:
                     print("creating a new document")
