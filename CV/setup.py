@@ -71,7 +71,6 @@ def grabTeams(self, title) -> list:
     return [teams[0][:-4], teams[1][:-1]]
 
 def main():
-    # process rest of playlist
     playlist = "PLisfUdjySbZVoTRbAlfObs8dI-cb-gWk-"
     colors = []
     inGame = False
@@ -124,18 +123,14 @@ def main():
 
             while cap.isOpened():
                 ret, frame = cap.read()
-
                 frame_count = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
 
-                # only grab feed if team colors are initiated
-                # how will you figure out if you are inGame once a round is finished
                 if ret:
                     if (frame_count % 60 == 0) and (len(colors) > 0):
                         inGame = grab.inGame(frame)
                         currPlayer = grab.grabPlayer(frame)
                         print(currPlayer)
                         if inGame:
-
                             if prevPlayer == currPlayer:
                                 clip = grab.grabFeed(frame, frame_count, currPlayer)
                                 if clip != None:
@@ -181,7 +176,6 @@ def main():
                             else:
                                 cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + intro_skip)
                                 continue
-
                 else:
                     break
 
