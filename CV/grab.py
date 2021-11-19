@@ -5,16 +5,22 @@ import datetime
 import cv2
 
 class Grab:
-    def __init__(self, id, date, bounds=None):
-        self.bounds = bounds
+    def __init__(self, id, date, colorBounds=None, mapBounds=None):
+        self.colorBounds = colorBounds
         self.id = id
         self.date = date
 
-    def getBounds(self) -> list:
-        return self.bounds
+    def getColorBounds(self) -> list:
+        return self.colorBounds
 
-    def setBounds(self, bounds):
-        self.bounds = bounds
+    def setColorBounds(self, colorBounds):
+        self.colorBounds = colorBounds
+
+    def getMapBounds(self):
+        return self.mapBounds
+
+    def setMapBounds(self, mapBounds):
+        self.mapBounds = mapBounds
 
     def setId(self, id):
         print("setting id")
