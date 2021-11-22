@@ -172,7 +172,7 @@ def main():
                             if inGame:
                                 colors = grabTeamColors(frame)
                                 print("Found colors: ", colors)
-                                grab.setBounds(colors)
+                                grab.setColorBounds(colors)
                             else:
                                 cap.set(cv2.CAP_PROP_POS_FRAMES, frame_count + intro_skip)
                                 continue
