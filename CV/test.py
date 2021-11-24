@@ -184,7 +184,7 @@ if args["detection"] == "timer":
     print(f"skipping {frames} frames")
 
 if args["detection"] == "map":
-    maps = {"RAID": [(30, 725), (450, 1045)]}
+    maps = {"RAID": [(30, 725), (450, 1045)], "GARRISON": [(69, 725), (450, 1045)]}
     # text = text.split("\n")[0]
     for map in maps:
         if map in text:

@@ -5,20 +5,13 @@ import datetime
 import cv2
 
 class Grab:
-    def __init__(self, id, date, colorBounds=None, map=None):
-        self.colorBounds = colorBounds
+    def __init__(self, id, date, map=None):
         self.id = id
         self.date = date
         self.map = map
 
-    def getColorBounds(self) -> list:
-        return self.colorBounds
-
-    def setColorBounds(self, colorBounds):
-        self.colorBounds = colorBounds
-
     def getMap(self):
-        return self.mapBounds
+        return self.map
 
     def setMap(self, map):
         self.map = map
@@ -151,7 +144,7 @@ class Grab:
 
 
     def grabMapName(self, frame) -> str:
-        maps = ["RAID", "GARRISON", ]
+        maps = {"RAID": [(30, 725), (450, 1045)], "GARRISON": [(35, 725), (450, 1045)]}
 
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
@@ -159,24 +152,16 @@ class Grab:
         # mapName = gray[585:640, 240:550]
 
         #1080
-        mapName = gray[875:975, 345:900]
+        map_roi = gray[875:975, 345:900]
 
-        # cv2.imshow("Map", mapName)
+        thresh = cv2.threshold(map_roi, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
 
-        text = pytesseract.image_to_string(mapName, lang="eng", config="--psm 6 --oem 1").split(" ")[0]
-
-
-        # text = text.split(" ")[0]
-
-        # full_text = pytesseract.image_to_string(frame, lang="eng", config="--psm 6 --oem 1")
-        #
-        # text = text.split(" ")[0]
-
-        # print(text)
+        text = pytesseract.image_to_string(thresh, lang="eng", config="--psm 6 --oem 1")
 
         for map in maps:
-            if text == map:
-                self.map = text
+            if map in text:
+                print("setting new map:", map)
+                self.map = maps[map]
                 return True
         return False
 
