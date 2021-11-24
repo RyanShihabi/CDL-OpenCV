@@ -5,10 +5,11 @@ import datetime
 import cv2
 
 class Grab:
-    def __init__(self, id, date, colorBounds=None, mapBounds=None):
+    def __init__(self, id, date, colorBounds=None, map=None):
         self.colorBounds = colorBounds
         self.id = id
         self.date = date
+        self.map = map
 
     def getColorBounds(self) -> list:
         return self.colorBounds
@@ -16,11 +17,11 @@ class Grab:
     def setColorBounds(self, colorBounds):
         self.colorBounds = colorBounds
 
-    def getMapBounds(self):
+    def getMap(self):
         return self.mapBounds
 
-    def setMapBounds(self, mapBounds):
-        self.mapBounds = mapBounds
+    def setMap(self, map):
+        self.map = map
 
     def setId(self, id):
         print("setting id")
@@ -150,7 +151,7 @@ class Grab:
 
 
     def grabMapName(self, frame) -> str:
-        maps = ["RAID", "GARRISON"]
+        maps = ["RAID", "GARRISON", ]
 
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
@@ -175,8 +176,9 @@ class Grab:
 
         for map in maps:
             if text == map:
-                return map
-        return "None"
+                self.map = text
+                return True
+        return False
 
     def grabTimer(self, frame) -> int:
         roi = frame[445:725, 550:1400]
