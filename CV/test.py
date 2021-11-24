@@ -69,7 +69,7 @@ if args["detection"] == "map":
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
     #1080
-    map_roi = gray[775:1079, 45:900]
+    map_roi = gray[775:1079, 45:910]
 
     thresh = cv2.threshold(map_roi, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
 
@@ -184,8 +184,9 @@ if args["detection"] == "timer":
     print(f"skipping {frames} frames")
 
 if args["detection"] == "map":
-    maps = {"RAID": [(30, 725), (450, 1045)], "GARRISON": [(69, 725), (450, 1045)]}
-    # text = text.split("\n")[0]
+    maps = {"RAID": [(30, 725), (450, 1045)], "GARRISON": [(50, 780), (575, 1025)]}
+    text = "".join(text.split(" "))
+    print(text)
     for map in maps:
         if map in text:
             print(maps[map])

@@ -144,7 +144,7 @@ class Grab:
 
 
     def grabMapName(self, frame) -> str:
-        maps = {"RAID": [(30, 725), (450, 1045)], "GARRISON": [(35, 725), (450, 1045)]}
+        maps = {"RAID": [(30, 725), (450, 1045)], "GARRISON": [(50, 780), (575, 1025)]}
 
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
@@ -152,11 +152,12 @@ class Grab:
         # mapName = gray[585:640, 240:550]
 
         #1080
-        map_roi = gray[875:975, 345:900]
+        map_name_roi = gray[875:975, 345:950]
 
-        thresh = cv2.threshold(map_roi, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
+        thresh = cv2.threshold(map_name_roi, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
 
         text = pytesseract.image_to_string(thresh, lang="eng", config="--psm 6 --oem 1")
+        text = "".join(text.split(" "))
 
         for map in maps:
             if map in text:
