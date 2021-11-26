@@ -144,7 +144,14 @@ class Grab:
 
 
     def grabMapName(self, frame) -> str:
-        maps = {"RAID": [(35, 725), (445, 1040)], "GARRISON": [(50, 780), (575, 1025)]}
+        maps = {"APOCALYPSE": [(), ()],
+                "CHECKMATE": [(), ()],
+                "CROSSROADS": [(), ()],
+                "EXPRESS": [(), ()],
+                "GARRISON": [(50, 780), (575, 1025)],
+                "MIAMI": [(), ()],
+                "MOSCOW": [(50, 775), (610, 1040)],
+                "RAID": [(35, 725), (445, 1040)]}
 
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
@@ -160,7 +167,7 @@ class Grab:
         text = "".join(text.split(" "))
 
         for map in maps:
-            if map in text:
+            if map in text and maps[map] != self.map:
                 print("setting new map:", map)
                 self.map = maps[map]
                 return True

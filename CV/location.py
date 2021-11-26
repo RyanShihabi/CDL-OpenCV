@@ -1,9 +1,9 @@
 import cv2
 import numpy as np
 
-cap = cv2.VideoCapture('./videos/demo.mp4')
+cap = cv2.VideoCapture('./videos/moscow_check.mp4')
 
-cap.set(cv2.CAP_PROP_POS_FRAMES, 2400)
+cap.set(cv2.CAP_PROP_POS_FRAMES, 1800)
 
 while cap.isOpened():
     ret, frame = cap.read()
@@ -36,7 +36,7 @@ while cap.isOpened():
         kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
         morph = cv2.morphologyEx(mid, cv2.MORPH_GRADIENT, kernel)
 
-        # cv2.imshow("mcanny", morph)
+        cv2.imshow("mcanny", morph)
 
         contours, hierarchy = cv2.findContours(image=morph, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_SIMPLE)
 
@@ -44,10 +44,10 @@ while cap.isOpened():
         #     cv2.drawContours(map, contours, -1, (0, 255, 0), 5)
         #     c = max(contours, key=cv2.contourArea)
         #     x,y,w,h = cv2.boundingRect(c)
-        #
-        #     cv2.rectangle(map, (x,y), (x+w, y+h), (0, 0, 255), 8)
 
-        cv2.rectangle(frame, (35, 725), (445, 1040), (0, 0, 255), 3)
+            # cv2.rectangle(map, (x,y), (x+w, y+h), (0, 0, 255), 8)
+
+        cv2.rectangle(frame, (50, 775), (610, 1040), (0, 0, 255), 3)
 
         # RAID1080: [(30, 725), (450, 1045)]
 

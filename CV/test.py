@@ -184,7 +184,14 @@ if args["detection"] == "timer":
     print(f"skipping {frames} frames")
 
 if args["detection"] == "map":
-    maps = {"RAID": [(30, 725), (450, 1045)], "GARRISON": [(50, 780), (575, 1025)]}
+    maps = {"APOCALYPSE": [(), ()],
+            "CHECKMATE": [(), ()],
+            "CROSSROADS": [(), ()],
+            "EXPRESS": [(), ()],
+            "GARRISON": [(50, 780), (575, 1025)],
+            "MIAMI": [(), ()],
+            "MOSCOW": [(1,2), (3,4)],
+            "RAID": [(35, 725), (445, 1040)]}
     text = "".join(text.split(" "))
     print(text)
     for map in maps:
