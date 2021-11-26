@@ -144,7 +144,7 @@ class Grab:
 
 
     def grabMapName(self, frame) -> str:
-        maps = {"RAID": [(30, 725), (450, 1045)], "GARRISON": [(50, 780), (575, 1025)]}
+        maps = {"RAID": [(35, 725), (445, 1040)], "GARRISON": [(50, 780), (575, 1025)]}
 
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 

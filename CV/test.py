@@ -190,6 +190,7 @@ if args["detection"] == "map":
     for map in maps:
         if map in text:
             print(maps[map])
+
 if args["detection"] == "feed":
     text = text.split('\n')[:-1]
     # players format [['clan tag', 'gamertag'], ...]

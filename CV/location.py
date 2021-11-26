@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-cap = cv2.VideoCapture('./videos/map_check.mp4')
+cap = cv2.VideoCapture('./videos/demo.mp4')
 
 cap.set(cv2.CAP_PROP_POS_FRAMES, 2400)
 
@@ -47,7 +47,7 @@ while cap.isOpened():
         #
         #     cv2.rectangle(map, (x,y), (x+w, y+h), (0, 0, 255), 8)
 
-        cv2.rectangle(frame, (50, 780), (575, 1025), (0, 0, 255), 3)
+        cv2.rectangle(frame, (35, 725), (445, 1040), (0, 0, 255), 3)
 
         # RAID1080: [(30, 725), (450, 1045)]
 
