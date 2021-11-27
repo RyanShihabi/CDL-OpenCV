@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-cap = cv2.VideoCapture('./videos/moscow_check.mp4')
+cap = cv2.VideoCapture('./videos/apocalypse_check.mp4')
 
 cap.set(cv2.CAP_PROP_POS_FRAMES, 1800)
 
@@ -11,7 +11,7 @@ while cap.isOpened():
     frame_count = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
 
     if ret:
-        map = frame[675:1050, 25:700]
+        map = frame[675:1060, 25:700]
         # cv2.imshow("none", map)
 
         mblur = cv2.medianBlur(map, 3)
@@ -47,7 +47,7 @@ while cap.isOpened():
 
             # cv2.rectangle(map, (x,y), (x+w, y+h), (0, 0, 255), 8)
 
-        cv2.rectangle(frame, (50, 775), (610, 1040), (0, 0, 255), 3)
+        cv2.rectangle(frame, (38, 720), (520, 1048), (0, 0, 255), 1)
 
         # RAID1080: [(30, 725), (450, 1045)]
 

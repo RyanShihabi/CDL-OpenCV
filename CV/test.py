@@ -185,12 +185,12 @@ if args["detection"] == "timer":
 
 if args["detection"] == "map":
     maps = {"APOCALYPSE": [(), ()],
-            "CHECKMATE": [(), ()],
+            "CHECKMATE": [(72, 805), (585, 1018)],
             "CROSSROADS": [(), ()],
-            "EXPRESS": [(), ()],
+            "EXPRESS": [(3, 4), (5, 6)],
             "GARRISON": [(50, 780), (575, 1025)],
-            "MIAMI": [(), ()],
-            "MOSCOW": [(1,2), (3,4)],
+            "MIAMI": [(34, 35), (31, 32)],
+            "MOSCOW": [(50, 775), (610, 1040)],
             "RAID": [(35, 725), (445, 1040)]}
     text = "".join(text.split(" "))
     print(text)

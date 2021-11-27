@@ -144,12 +144,11 @@ class Grab:
 
 
     def grabMapName(self, frame) -> str:
-        maps = {"APOCALYPSE": [(), ()],
-                "CHECKMATE": [(), ()],
-                "CROSSROADS": [(), ()],
-                "EXPRESS": [(), ()],
+        maps = {"APOCALYPSE": [(38, 720), (520, 1048)],
+                "CHECKMATE": [(72, 805), (585, 1018)],
+                "EXPRESS": [(45, 742), (520, 1042)],
                 "GARRISON": [(50, 780), (575, 1025)],
-                "MIAMI": [(), ()],
+                "MIAMI": [(50, 700), (420, 1037)],
                 "MOSCOW": [(50, 775), (610, 1040)],
                 "RAID": [(35, 725), (445, 1040)]}
 
