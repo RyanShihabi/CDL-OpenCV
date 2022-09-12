@@ -8,7 +8,7 @@ from pprint import pprint
 from grab import Grab
 import cv2
 
-client = MongoClient('mongodb+srv://admin:7pPNMQZHfblHXlUg@cdlcluster.shvz6.mongodb.net/CDL?retryWrites=true&w=majority')
+client = MongoClient('SECRET')
 
 db = client.CDL
 playerCol = db.Players
