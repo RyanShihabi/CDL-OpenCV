@@ -12,19 +12,7 @@ args = vars(ap.parse_args())
 
 image = cv2.imread(args["image"])
 
-# roi = image[350:475, 0:125]
-#
-
 print((image.shape[1], image.shape[0]))
-
-# try resizing the image to get broader pixel values
-# You only need to look on the left side of the kill feed. That determines a clip
-# Map text detection works best with blur filter
-# Kill feed text detects best with blur filter
-# figure out if there are better blur methods
-# maybe start using masking to filter out unwanted COLOR
-# test kill feed on multiple scenarios
-    # five players on feed
 
 if args["detection"] == "player":
     # player_roi = image[940:990, 1355:1650]
@@ -35,30 +23,10 @@ if args["detection"] == "player":
     ret, thresh = cv2.threshold(gray, 70, 255, cv2.THRESH_BINARY)
     adapt = cv2.adaptiveThreshold(gray,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY,99,3)
 
-    # hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    # lower_black = np.array([0,0,0])
-    # upper_black = np.array([10,10,10])
-    # mask = cv2.inRange(hsv, lower_black, upper_black)
-    # res = cv2.bitwise_and(frame,frame, mask=mask)
-
-    # w_thresh = cv2.threshold(gray, 200, 255, cv2.THRESH_BINARY_INV)[1]
-    # b_thresh = cv2.threshold(gray, 50, 255, cv2.THRESH_BINARY)[1]
-
-    # thresh = cv2.threshold(gray, 30, 0, cv2.THRESH_BINARY_INV)[1]
-
     filename = f"{os.getpid()}.png"
     cv2.imwrite(filename, adapt)
     cv2.imshow("Output", adapt)
-    # cv2.imshow("Output", w_thresh)
-    # cv2.imshow("Output", b_thresh)
-
-    # w_text = pytesseract.image_to_string(w_thresh, lang="eng", config="--psm 6 --oem 1").split("\n")[0]
-    # b_text = pytesseract.image_to_string(b_thresh, lang="eng", config="--psm 6 --oem 1").split("\n")[0]
     text = pytesseract.image_to_string(adapt, lang="eng", config="--psm 6 --oem 1").split("\n")[0]
-
-    # text = w_text+b_text
-
-    # text = "".join(x for x in text if x.isalpha() or x == "6")
 
     print(text)
     print(len(text))
@@ -79,9 +47,6 @@ if args["detection"] == "map":
 
 if args["detection"] == "feed":
     #720p roi
-    # gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-    # thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
     feed_roi = image[500:700, 0:175]
 
     feed_roi = cv2.medianBlur(feed_roi, 1)
@@ -133,17 +98,9 @@ if args["detection"] == "color":
     cv2.waitKey(0)
 
 if args["detection"] == "game":
-    # there may be a better roi
     roi = image[1013:1014, 1455:1456]
     b, g, r = roi[0, 0]
     print([b, g, r])
-    # width = int(roi.shape[1] * 250 / 100)
-    # height = int(roi.shape[0] * 250 / 100)
-    #
-    # roi = cv2.resize(roi, (width, height), interpolation = cv2.INTER_AREA)
-    # # roi = cv2.medianBlur(roi, 3)
-    #
-    # # roi = cv2.threshold(np.array(roi), 125, 255, cv2.THRESH_BINARY)[1]
     filename = f"{os.getpid()}.png"
 
     cv2.imwrite(filename, roi)
@@ -162,19 +119,10 @@ if args["detection"] == "player":
     print(len(text))
 
 if args["detection"] == "game":
-    # modes = ["CONTROL", "HARDPOINT", "SEARCH & DESTROY", "SND"] #find other game modes, test mutltiple roi
-
-    # text = text.split("\n")[0]
-
     if b == 204 and g == 199 and r == 202:
         print("In Game")
     else:
         print("Not in game")
-
-    # if text in modes:
-    #     print("In Game")
-    # else:
-    #     print("Not in game")
 
 if args["detection"] == "timer":
     # skip an extra minute ahead
@@ -207,5 +155,3 @@ if args["detection"] == "feed":
             players.append(line.split(" ")[:2])
 
     print(players)
-    # print(isClip(players))
-    # print(isClip([['[ATL]', 'gamertag'], ['(Atl]', 'gamertag']]))

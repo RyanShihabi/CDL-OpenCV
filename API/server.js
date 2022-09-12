@@ -12,22 +12,11 @@ const db = require("./db");
 const dbName = "CDL";
 const collectionName = "Players";
 
-db.initialize(dbName, collectionName, function (dbCollection) { // successCallback
-   // get all items
+db.initialize(dbName, collectionName, function (dbCollection) {
    dbCollection.find().toArray(function (err, result) {
       if (err) throw err;
       console.log(result);
-
-      // << return response to client >>
    });
-
-   // server.get("/players", (req, res) => {
-   //    // return updated list
-   //    dbCollection.find().toArray((error, result) => {
-   //       if (error) throw error;
-   //       res.json(result);
-   //    });
-   // });
 
    server.get("/players", (req, res) => {
      let name = req.query.name;
@@ -53,7 +42,7 @@ db.initialize(dbName, collectionName, function (dbCollection) { // successCallba
      }
    });
 
-}, function (err) { // failureCallback
+}, function (err) {
    throw (err);
 });
 

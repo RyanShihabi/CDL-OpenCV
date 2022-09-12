@@ -3,8 +3,6 @@ import numpy as np
 
 cap = cv2.VideoCapture('./videos/demo.mp4')
 
-# cap.set(cv2.CAP_PROP_POS_FRAMES, 1800)
-
 while cap.isOpened():
     ret, frame = cap.read()
 
@@ -13,14 +11,10 @@ while cap.isOpened():
 
         focus = frame[725:1040, 35:445]
 
-        # cv2.imshow("focused", focus)
-
         mblur = cv2.medianBlur(map, 3)
         fblur = cv2.medianBlur(focus, 3)
 
         gray = cv2.cvtColor(mblur, cv2.COLOR_BGR2GRAY)
-
-        # cv2.imshow("gray", gray)
 
         hsv = cv2.cvtColor(fblur, cv2.COLOR_BGR2HSV)
 

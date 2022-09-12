@@ -1,6 +1,5 @@
 import os
 from os import path
-import pathlib
 import json
 import datetime
 import numpy as np
@@ -62,11 +61,8 @@ def grabTeamColors(frame) -> list:
 
     return colors
 
-# teamHSV = {"Toronto Ultra": [np.array([0, 0, 177], np.uint8), np.array([179, 55, 255], np.uint8)],
-#             "Atlanta FaZe": [np.array([0, 68, 120], np.uint8), np.array([179, 205, 255], np.uint8)]}
-
 def grabTeams(self, title) -> list:
-# "Champs Final | @Toronto Ultra vs @Atlanta FaZe | Championship Weekend | Day 4"
+# "Ex: Champs Final | @Toronto Ultra vs @Atlanta FaZe | Championship Weekend | Day 4"
     teams = title.split("|")[1].split("@")[1:]
     return [teams[0][:-4], teams[1][:-1]]
 
@@ -102,7 +98,6 @@ def main():
             completed_videos.append(line.split("\n")[0])
     f.close()
 
-    # maps = []
     clips = {"Players": []}
     for video in videos:
         if video[0] not in completed_videos:
@@ -210,7 +205,6 @@ def main():
                                     "date": clip["date"],
                                     }
                                     # sort values by datetime value
-                                    # figure out how to use $sort with datetime
                             }
                         }
                     )

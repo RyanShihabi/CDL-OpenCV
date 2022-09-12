@@ -1,7 +1,7 @@
 const mongodb = require('mongodb');
 const MongoClient = mongodb.MongoClient;
 
-const dbConnectionUrl = 'mongodb+srv://admin:7pPNMQZHfblHXlUg@cdlcluster.shvz6.mongodb.net/CDL?retryWrites=true&w=majority';
+const dbConnectionUrl = 'SECRET';
 
 function initialize(dbName, dbCollectionName, successCallback, failureCallback) {
 	MongoClient.connect(dbConnectionUrl, function (err, dbInstance) {
