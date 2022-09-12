@@ -19,3 +19,4 @@ demo.py
 .env
 gunTemplate.py
 featureTest.py
+__pycache__/
